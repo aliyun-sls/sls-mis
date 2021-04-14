@@ -11,5 +11,5 @@ LOGSTORE=$4
 ENDPOINT=$5
 
 cd ${DEMO_HOME} && ./mvnw clean package docker:build
-docker run -itd -p 8080:8080 -e ACCESS_KEY_ID=${ACCESS_KEY_ID} -e ACCESS_KEY_SECRET=${ACCESS_KEY_SECRET} -e PROJECT=${PROJECT} -e LOGSTORE=${LOGSTORE} -e ENDPOINT=${ENDPOINT} alibaba-sls-demo/opentelemetry-java
+docker run -itd -p 8080:8080 -e ACCESS_KEY_ID=${ACCESS_KEY_ID} -e ACCESS_KEY_SECRET=${ACCESS_KEY_SECRET} -e PROJECT=${PROJECT} -e LOGSTORE=${LOGSTORE} -e ENDPOINT=${ENDPOINT} asls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-java
 echo "Server is up and you can visit http://localhost:8080/hello-world ."
