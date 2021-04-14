@@ -66,7 +66,7 @@
                 <configuration>
                     <images>
                         <image>
-                            <name>alibaba-sls-demo/opentelemetry-java</name>
+                            <name>sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-java</name>
                             <build>
                                 <dockerFile>${project.basedir}/Dockerfile</dockerFile>
                                 <tags>
