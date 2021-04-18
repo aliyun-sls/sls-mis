@@ -1,5 +1,2 @@
-
-build_docker_1.0.0_rc1:
-	docker build -f Dockerfile-1.0.0rc1
-publish_docker:
-	docker push
+build_docker_image:
+	docker build -t sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-python:latest -t sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-python:1.0.0rc1 .
