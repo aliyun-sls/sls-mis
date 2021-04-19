@@ -1,0 +1,35 @@
+# 服务名称
+spring:
+  application:
+    name: victorService
+  #禁用掉模板缓冲，在开发环境中可以实时的观察到html页面的更改
+  thymeleaf:
+    cache: false
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://integral-db:3306/integral?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+    username: integral
+    password: default_password
+  zipkin:
+    baseUrl: http://${zipkin_host:zipkin}:9411/
+    enabled: ${zipkin_enabled:false}
+  sleuth:
+    sampler:
+      percentage: 1.0
+server:
+  port: ${port:8089}
+endpoints:
+  metrics:
+    enabled: false
+  prometheus:
+    id: metrics
+  health:
+    enabled: false
+
+
+
+
+mybatis:
+  type-aliases-package: works.weave.sock.integral.entities
+  mapper-locations: classpath:mapper/*Mapper.xml

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace:改mapper.xml映射文件的唯一标识并且必须和数据处理层的接口的路径相同-->
+<mapper namespace="works.weave.socks.integral.dao.ReduceIntegralDetailDao">
+    <!--   必须添加property属性 ，区别于是否加主键-->
+    <resultMap id="ReduceIntegralDetail" type="works.weave.socks.integral.entities.ReduceIntegralDetail">
+        <id column="id" property="id" javaType="Long" ></id>
+        <result column="reduce_id" property="reduceId" javaType="Long" ></result>
+        <result column="add_id" property="addId" javaType="Long" ></result>
+        <result column="value" property="value" javaType="float" ></result>
+        <result column="expire_time" property="expireTime" javaType="Date"></result>
+        <result column="user_id" property="userId" javaType="String"></result>
+        <result column="deleted" property="deleted" javaType="int"></result>
+        <result column="create_time" property="createTime" javaType="Date"></result>
+        <result column="update_time" property="updateTime" javaType="Date"></result>
+    </resultMap>
+    <sql id="tabel">reduce_integral</sql>
+    <!--id的值必须和数据处理层的接口名一致-->
+    <insert id="save" parameterType="works.weave.socks.integral.entities.ReduceIntegralDetail">
+        insert into reduce_integral
+        (reduce_id,add_id,value,expire_time,user_id,deleted,create_time,update_time)
+        value (#{reduceId},#{addId},#{value},#{expireTime},#{userId},0,now(),now())
+    </insert>
+
+    <!--批量增加测试-->
+    <insert id="batchAdd" parameterType="java.util.List">
+        insert into reduce_integral
+        (
+        reduce_id,add_id,value,expire_time,user_id,deleted,create_time,update_time
+        )
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.reduceId},
+            #{item.addId},
+            #{item.value},
+            #{item.expireTime},
+            #{item.userId},
+            0,
+            now(),
+            now()
+            )
+        </foreach>
+    </insert>
+
+
+
+
+
+</mapper>

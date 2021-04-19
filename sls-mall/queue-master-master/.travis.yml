@@ -1,0 +1,24 @@
+language: java
+sudo: required
+services:
+- docker
+jdk:
+- oraclejdk8
+install: true
+env:
+- GROUP=weaveworksdemos COMMIT=$TRAVIS_COMMIT TAG=$TRAVIS_TAG REPO=queue-master;
+script:
+- set -e
+- "./scripts/build.sh;"
+- "./test/test.sh unit.py"
+- "./test/test.sh component.py"
+after_success:
+- set -e;
+- "./test/test.sh coveralls.py"
+- if [ -z "$DOCKER_PASS" ] ; then echo "This is a build triggered by an external PR.
+  Skipping docker push."; exit 0; fi;
+- docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS;
+- "./scripts/push.sh"
+notifications:
+  slack:
+    secure: dM7eRa8W7da9jV8V6pQ+swx3FbqYQeJbjoCn5fc1autZWExA4ENEOcyQpqyzIQE6aSyMORiWN4Q7HzhifMu4F+riuXj1SdgoCqiXrDrTcxninkJiBHUtwaE+jVN6uHZBtGLn5umHk3wRp2U20sbp9JzjVbQ/di21dmfgSUcGLWnsEYeaqKJWdCR9Jcar7w3+W3ScKV0/Uim4hd79suk5AfOTzq7KFYW5P+CfGozpWHCLC/qGZPGka6IWs42arSZoqQmjB/S7Vr6d86vdd6BuaYCQSCLicBHfGhhpHT3WDII5IUlR5HOWjv2bwWPG5qZNQQrS8OagOaN4zBxKt2N379bsx6GRBXVFTDGNlJILV2h8w+fjm+rpLHPMSWvKiJarK+0pJteq0a9JuJ49pykNZnyqBadypLRxn6kXxm23xxzjwLMOfi59oO+bZyXjX5claG0Lxor0y069NRfDjPitEXf1g4TVYQviJ1shVGMDilsDx2D3UAWhJrbjYjhkJ/08KitZDTlaak6FgUXs12ioTA4SYOf4XNCI/UiNxSZ1L9RG9AczAXnHigxyfsizDNfP8m/O7x99t3uxP1yrZiLZnTI6EJG+PGziltOhFY9YWLR8+mewNbRprsTRvhvKH4EX1r3dlKya7o0Hgbd1QNEWLhwntB0TWmU+g8IwsS5EDno=
