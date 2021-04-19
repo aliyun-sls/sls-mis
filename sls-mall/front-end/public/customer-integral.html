@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="robots" content="all,follow">
+    <meta name="googlebot" content="index,follow,snippet,archive">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="WeaveSocks Demo App">
+    <meta name="author" content="Ondrej Svestka | ondrejsvestka.cz">
+    <meta name="keywords" content="">
+
+    <title>
+        WeaveSocks
+    </title>
+
+    <meta name="keywords" content="">
+
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100'
+          rel='stylesheet' type='text/css'>
+
+    <!-- styles -->
+    <link href="css/font-awesome.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/animate.min.css" rel="stylesheet">
+    <link href="css/owl.carousel.css" rel="stylesheet">
+    <link href="css/owl.theme.css" rel="stylesheet">
+
+    <!-- theme stylesheet -->
+    <link href="css/style.blue.css" rel="stylesheet" id="theme-stylesheet">
+
+    <!-- your stylesheet with modifications -->
+    <link href="css/custom.css" rel="stylesheet">
+
+    <script src="js/respond.min.js"></script>
+
+    <link rel="shortcut icon" href="favicon.png">
+
+
+</head>
+
+<body>
+<div id="topbar"></div>
+<div id="navbar"></div>
+
+<div id="all">
+
+    <div id="content">
+        <div class="container">
+
+            <div class="col-md-12">
+
+                <ul class="breadcrumb">
+                    <li><a href="#">Home</a>
+                    </li>
+                    <li>My integral</li>
+                </ul>
+
+            </div>
+
+            <div class="col-md-3">
+                <!-- *** CUSTOMER MENU ***
+_________________________________________________________ -->
+                <div class="panel panel-default sidebar-menu">
+
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Customer section</h3>
+                    </div>
+
+                    <div class="panel-body">
+
+                        <ul class="nav nav-pills nav-stacked">
+                            <li class="active">
+                                <a href="#"><i
+                                        class="fa fa-list"></i> My integrals</a>
+                            </li>
+                            <li class="active">
+                                <a href="customer-orders.html"><i
+                                        class="fa fa-list"></i> My orders</a>
+                            </li>
+                            <!--<li>-->
+                            <!--<a href="customer-wishlist.html"><i-->
+                            <!--class="fa fa-heart"></i> My wishlist</a>-->
+                            <!--</li>-->
+                            <!--<li>-->
+                            <!--<a href="customer-account.html"><i-->
+                            <!--class="fa fa-user"></i> My account</a>-->
+                            <!--</li>-->
+                            <!--<li>-->
+                            <!--<a href="index.html"><i-->
+                            <!--class="fa fa-sign-out"></i> Logout</a>-->
+                            <!--</li>-->
+                        </ul>
+                    </div>
+
+                </div>
+                <!-- /.col-md-3 -->
+
+                <!-- *** CUSTOMER MENU END *** -->
+            </div>
+
+            <div class="col-md-9" id="customer-orders">
+                <div class="box" style="">
+                    <h1>My integrals</h1>
+
+                    <div class="table-responsive">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>User Id</th>
+                                    <th>createTime</th>
+                                    <th>integral</th>
+                                    <th>expriaTime</th>
+                                    <th>reason</th>
+                                </tr>
+                                </thead>
+                                <tbody id="tableIntegral">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.container -->
+    </div>
+    <!-- /#content -->
+
+    <div id="footer"></div>
+</div>
+<!-- /#all -->
+
+
+<!-- *** SCRIPTS TO INCLUDE ***
+_________________________________________________________ -->
+<script src="js/jquery-1.11.0.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/jquery.cookie.js"></script>
+<script src="js/waypoints.min.js"></script>
+<script src="js/modernizr.js"></script>
+<script src="js/bootstrap-hover-dropdown.js"></script>
+<script src="js/owl.carousel.min.js"></script>
+<script src="js/front.js"></script>
+<script src="js/jquery.query-object.js"></script>
+<script src="js/client.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $.ajaxSetup({
+            contentType: "application/json; charset=utf-8"
+        });
+
+        console.log("Loading components for basket.html");
+        $("#topbar").load("topbar.html");
+        $("#navbar").load("navbar.html");
+        $("#footer").load("footer.html");
+    })
+</script>
+<script>
+    $(document).ready(function () {
+        $.getJSON('/integral', {}, function (data) {
+                $.each(data, function (index, element) {
+                    //new Date(parseInt(element.createTime)).toLocaleString().replace(/:\d{1,2}$/,' ')
+                    $('#tableIntegral').append('\
+                    <tr>\
+                    <th># ' + element.userId + '</th>\
+                    <td>' + new Date(element.createTime+8 * 3600 * 1000).toJSON().substr(0, 19).replace('T', ' ') + '</td>\
+                    <td>$ ' + element.value + '</td>\
+                    <td>' + new Date(element.expireTime+8 * 3600 * 1000).toJSON().substr(0, 10).replace('T', ' ') + '</td>\
+                    <td>' + element.reason + '</td>\
+                    <td>\
+                    </td>\
+                    </tr>');
+                });
+            }
+        )
+    });
+</script>
+
+</body>
+
+</html>
