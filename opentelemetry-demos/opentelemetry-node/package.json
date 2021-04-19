@@ -1,0 +1,27 @@
+{
+  "name": "opentelemetry-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=8"
+  },
+  "author": "",
+  "keywords": [],
+  "license": "ISC",
+  "dependencies": {
+    "@opentelemetry/api": "^0.18.0",
+    "@opentelemetry/exporter-collector-grpc": "^0.18.2",
+    "@opentelemetry/instrumentation": "^0.18.0",
+    "@opentelemetry/instrumentation-express": "^0.15.0",
+    "@opentelemetry/instrumentation-http": "^0.18.2",
+    "@opentelemetry/node": "^0.18.2",
+    "@opentelemetry/tracing": "^0.18.2",
+    "express": "^4.17.1",
+    "grpc": "^1.24.6"
+  }
+}
