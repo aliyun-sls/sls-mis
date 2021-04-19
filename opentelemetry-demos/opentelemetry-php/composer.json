@@ -1,0 +1,20 @@
+{
+  "name": "alibab-sls/opentelemetry-php",
+  "authors": [
+    {
+      "name": "qiansheng91",
+      "email": "qiansheng.zx@gmail.com"
+    }
+  ],
+  "config": {
+    "optimize-autoloader": true
+  },
+  "require": {
+    "open-telemetry/opentelemetry": "^0.0.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "SLS\\Opentelemetry\\": "src/"
+    }
+  }
+}
