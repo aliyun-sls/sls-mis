@@ -7,8 +7,7 @@
 
 ## 系统架构图
 
-
-![系统架构图](https://victor1.oss-cn-hangzhou.aliyuncs.com/mall/images/mall.png)
+![系统架构图](https://victor1.oss-cn-hangzhou.aliyuncs.com/mall/mall.png)
 
 ## 组织结构
 
