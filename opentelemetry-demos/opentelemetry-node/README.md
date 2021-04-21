@@ -1,7 +1,17 @@
-# Opentelemetry Node
+# Opentelemetry Node demo
+
+Opentelemetry Node Demo 采用 Opentelemetry-js 自动探针采集 Trace 数据，并上报到 SLS 服务。
 
 ## Quick start
+
 ```shell
-$ make build_docker_image
-$ docker run -e ACCESS_KEY_ID=<YOUR_ACCESS_KEY_ID> -e ACCESS_SECRET=<YOUR_ACCESS_SECRET> -e PROJECT=<YOUR_PROJECT> -e LOGSTORE=<YOUR_LOGSTORE> -e ENDPOINT=<YOUR_ENDPOINT> sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-node
+export PROJECT=<PROJECT_NAME>
+export LOGSTORE=<LOGSTORE_NAME>
+export ACCESS_KEY_ID=<ACCESS_KEY_ID>
+export ACCESS_SECRET=<ACCESS_SECRET>
+export SERVICE_NAME=opentelemetry-node
+export SERVICE_VERSION=1.0.0
+
+npm install
+npm run start
 ```

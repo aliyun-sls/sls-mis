@@ -1,7 +1,7 @@
-# Opentelemetry Python
+# Opentelemetry Python Demo
 
 ## Quick start
 
-``` shell
+```shell
 $ make build_docker_image
 ```
