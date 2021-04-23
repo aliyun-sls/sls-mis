@@ -12,6 +12,6 @@ WORKDIR /opentelemetry-php
 COPY composer.json ./
 COPY . .
 RUN composer install
-EXPOSE 8080
+EXPOSE 8087
 
-CMD ["php", "-S", "0.0.0.0:8080", "src/server.php"]
+CMD ["php", "-S", "0.0.0.0:8087", "src/server.php"]

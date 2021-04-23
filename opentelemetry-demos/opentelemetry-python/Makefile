@@ -1,2 +1,19 @@
-build_docker_image:
-	docker build -t sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-python:latest -t sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-python:1.0.0rc1 .
+PYTHON_IMAGE_NAME := sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-python
+PYTHON_IMAGE_VERSION := 1.0.0rc1
+
+
+build_project:
+	poetry install
+
+build_image: build_project
+	docker build -t $(PYTHON_IMAGE_NAME):latest -t $(PYTHON_IMAGE_NAME):$(PYTHON_IMAGE_VERSION) .
+
+push_image: build_image
+	docker push $(PYTHON_IMAGE_NAME):$(PYTHON_IMAGE_VERSION)
+
+push_latest_image:
+	docker push $(PYTHON_IMAGE_NAME):latest
+
+
+push_images: push_image push_latest_image
+

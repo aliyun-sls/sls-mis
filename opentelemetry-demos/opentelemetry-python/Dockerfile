@@ -17,6 +17,6 @@ COPY pyproject.toml poetry.lock startup.sh ./
 COPY . .
 RUN poetry install --no-dev
 
-EXPOSE 8080
+EXPOSE 8087
 
 CMD ["bash", "startup.sh"]

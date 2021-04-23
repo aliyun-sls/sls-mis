@@ -55,8 +55,8 @@ func main() {
 
 	otelHandler := otelhttp.NewHandler(http.HandlerFunc(helloHandler), "Hello")
 	http.Handle(endPoint, otelHandler)
-	fmt.Println("Now listen port 8080, you can visit 127.0.0.1:8080/hello-word .")
-	err = http.ListenAndServe(":8080", nil)
+	fmt.Println("Now listen port 8085, you can visit 127.0.0.1:8080/hello-word .")
+	err = http.ListenAndServe(":8085", nil)
 	if err != nil {
 		panic(err)
 	}

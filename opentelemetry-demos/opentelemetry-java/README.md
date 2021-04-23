@@ -36,5 +36,3 @@ java -javaagent:$PWD/target/opentelemetry-javaagent-all.jar -Dotel.resource.attr
 ```shell
 curl http://localhost:8080/hello-world
 ```
-
-4. 打开 SLS 控制台，查看 Trace 数据
