@@ -16,5 +16,4 @@ COPY . .
 COPY sources.list /etc/apt/sources.list
 RUN apt update && apt install -y libc-dev && dotnet restore
 
-EXPOSE  8083
 CMD ["dotnet", "run", "--project", "WebApplication"]

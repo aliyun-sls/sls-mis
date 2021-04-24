@@ -5,7 +5,7 @@ from opentelemetry import trace
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from server.otslsprovider import OpenTelemetrySLSProvider
-
+from pprint import pprint
 
 def start():
     parser = argparse.ArgumentParser(description= "opentelemetry python demo")
@@ -17,7 +17,6 @@ def start():
     parser.add_argument("--service_name", default="opentelemetry-python", help="service name")
     parser.add_argument("--service_version", default="1.0.0", help="service version")
     args = parser.parse_args()
-
 
     sls_ot_provider = OpenTelemetrySLSProvider(access_key_id= args.access_key_id, access_secret= args.access_secret,
                                            project=args.project, logstore= args.logstore, endpoint= args.endpoint,
@@ -37,4 +36,4 @@ def start():
             requests.get("http://www.baidu.com")
         return "hello world"
 
-    app.run(port=8088)
+    app.run(host="0.0.0.0", port=8088)

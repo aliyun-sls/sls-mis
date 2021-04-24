@@ -27,5 +27,5 @@ go build -o main src/server.go
 3. 访问服务
 
 ```shell
-curl http://localhost:8085/hello-world
+curl http://localhost:8084/hello-world
 ```

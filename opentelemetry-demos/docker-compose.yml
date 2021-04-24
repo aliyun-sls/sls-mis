@@ -1,0 +1,68 @@
+version: "3.9"
+
+services:
+  opentelemetry-dotnet:
+    image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-dotnet
+    environment:
+      - ACCESS_KEY_ID
+      - ACCESS_SECRET
+      - PROJECT
+      - LOGSTORE
+      - ENDPOINT
+    ports:
+      - 8083:8083
+
+  opentelemetry-go:
+    image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-go
+    environment:
+      - ACCESS_KEY_ID
+      - ACCESS_SECRET
+      - PROJECT
+      - LOGSTORE
+      - ENDPOINT
+    ports:
+      - 8084:8084
+
+  opentelemetry-java:
+    image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-java
+    environment:
+      - ACCESS_KEY_ID
+      - ACCESS_SECRET
+      - PROJECT
+      - LOGSTORE
+      - HTTPS_ENDPOINT
+    ports:
+      - 8085:8085
+
+  opentelemetry-node:
+    image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-node
+    environment:
+      - ACCESS_KEY_ID
+      - ACCESS_SECRET
+      - PROJECT
+      - LOGSTORE
+      - ENDPOINT
+    ports:
+      - 8086:8086
+
+  opentelemetry-php:
+    image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-php
+    environment:
+      - ACCESS_KEY_ID
+      - ACCESS_SECRET
+      - PROJECT
+      - LOGSTORE
+      - ZIPKIN_ENDPOINT
+    ports:
+      - 8087:8087
+
+  opentelemetry-python:
+    image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-python
+    environment:
+      - ACCESS_KEY_ID
+      - ACCESS_SECRET
+      - PROJECT
+      - LOGSTORE
+      - ENDPOINT
+    ports:
+      - 8088:8088

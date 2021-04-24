@@ -1,4 +1,4 @@
-FROM node:14.16.1-alpine3.10
+FROM node:12.19.1-alpine
 ENV ACCESS_KEY_ID="" \
     ACCESS_KEY_SECRET="" \
     PROJECT="" \

@@ -7,7 +7,7 @@ use OpenTelemetry\Sdk\Trace\Clock;
 use OpenTelemetry\Sdk\Trace\SpanProcessor\SimpleSpanProcessor;
 use OpenTelemetry\Sdk\Trace\TracerProvider;
 
-$endpoint = getenv('ENDPOINT');
+$endpoint = getenv('ZIPKIN_ENDPOINT');
 $project = getenv('PROJECT');
 $logstore = getenv('LOGSTORE');
 $accessKeyId = getenv('ACCESS_KEY_ID');

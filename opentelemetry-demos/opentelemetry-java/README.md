@@ -34,5 +34,5 @@ java -javaagent:$PWD/target/opentelemetry-javaagent-all.jar -Dotel.resource.attr
 3. 访问服务
 
 ```shell
-curl http://localhost:8080/hello-world
+curl http://localhost:8085/hello-world
 ```

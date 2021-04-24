@@ -4,7 +4,7 @@ NODE_DOCKER_VERSION := 0.18.0
 clean_images:
 	docker image prune -f
 
-build_images: clean_images
+build_image: clean_images
 	docker build -t $(NODE_DOCKER_NAME):$(NODE_DOCKER_VERSION) -t $(NODE_DOCKER_NAME):latest .
 
 push_image: build_images

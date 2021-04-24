@@ -1,8 +1,6 @@
 'use strict';
 require('./init-trace')(require('./utils')());
-
-import express from 'express';
-const app = express();
+const app = require('express')();
 
 app.get('/hello-world', (req, res, next) => {
     res.send("hello world");

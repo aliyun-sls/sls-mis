@@ -16,13 +16,13 @@ const (
 
 func main() {
 	var opts struct {
-		ServiceName    string `short:"s" long:"service-name" description:"service name" require:"true" default:"opentelemetry-go-demo" env:"SERVICE_NAME"`
+		ServiceName    string `short:"s" long:"service-name" description:"service name" require:"true" default:"opentelemetry-go" env:"SERVICE_NAME"`
 		ServiceVersion string `short:"v" long:"service-version" require:"true" description:"service version" default:"1.0.0" env:"SERVICE_VERSION"`
 
 		Logstore     string `short:"l" long:"logstore" description:"logstore" require:"true" env:"LOGSTORE"`
 		Project      string `short:"p" long:"project" description:"project" require:"true" env:"PROJECT"`
 		AccessKey    string `short:"k" long:"access-key" description:"access key id" require:"true" env:"ACCESS_KEY_ID"`
-		AccessSecret string `short:"a" long:"access-secret" description:"access secret" require:"true" env:"ACCESS_KEY_SECRET"`
+		AccessSecret string `short:"a" long:"access-secret" description:"access secret" require:"true" env:"ACCESS_SECRET"`
 		Endpoint     string `short:"e" long:"endpoint" description:"endpoint" require:"true" env:"ENDPOINT"`
 	}
 
@@ -55,8 +55,9 @@ func main() {
 
 	otelHandler := otelhttp.NewHandler(http.HandlerFunc(helloHandler), "Hello")
 	http.Handle(endPoint, otelHandler)
-	fmt.Println("Now listen port 8085, you can visit 127.0.0.1:8080/hello-word .")
-	err = http.ListenAndServe(":8085", nil)
+	fmt.Println("Now listen port 8084, you can visit 127.0.0.1:8084/hello-word .")
+	err = http.ListenAndServe(":8084", nil)
+
 	if err != nil {
 		panic(err)
 	}

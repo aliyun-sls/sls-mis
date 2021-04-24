@@ -3,7 +3,7 @@ ENV ACCESS_KEY_ID="" \
     ACCESS_KEY_SECRET="" \
     PROJECT="" \
     LOGSTORE="" \
-    ENDPOINT="" \
+    ZIPKIN_ENDPOINT="" \
     SERVICE_NAME="opentelementry-php" \
     SERVICE_VERSION="1.0.0"
 
