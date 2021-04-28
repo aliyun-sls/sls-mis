@@ -1,0 +1,21 @@
+name = "zipkin-ot-context-propagate"
+start_step = "step1"
+
+[components]
+opentelemetry-java = "localhost:8085"
+brave-springboot-demo = "localhost:8089"
+
+
+[[callSteps]]
+name = "step1"
+goTo = "opentelemetry-java"
+nextPath = "step2"
+
+[[callSteps]]
+name = "step2"
+goTo = "brave-springboot-demo"
+nextPath = "step3"
+
+[[callSteps]]
+name = "step3"
+goTo = "opentelemetry-java"

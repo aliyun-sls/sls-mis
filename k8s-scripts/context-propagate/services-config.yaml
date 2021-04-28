@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-services
+  namespace: opentelemetry
+data:
+  ot-zipkin-context-propagte: |
+    name = "zipkin-ot-context-propagate"
+    start_step = "step1"
+    [components]
+    opentelemetry-java = "localhost:8085"
+    brave-springboot-demo = "localhost:8089"
+    [[callSteps]]
+    name = "step1"
+    goTo = "opentelemetry-java"
+    nextPath = "step2"
+    [[callSteps]]
+    name = "step2"
+    goTo = "brave-springboot-demo"
+    nextPath = "step3"
+    [[callSteps]]
+    name = "step3"
+    goTo = "opentelemetry-java"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: environment-variables
+  namespace: opentelemetry
+data:
+  ACCESS_KEY_ID: <YOUR_ACCESS_KEY_ID>
+  ACCESS_SECRET: <YOUR_ACCESS_SECRET>
+  ENDPOINT: <YOUR_ENDPOINT>
+  HTTPS_ENDPOINT: https://${ENDPOINT}
+  PROJECT: <YOUR_PROJECT>
+  LOGSTORE: <YOUR_LOGSTORE>

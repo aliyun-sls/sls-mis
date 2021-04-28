@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ot-zipkin-context-propagate
+  namespace: opentelemetry
+  labels:
+    type: demo
+spec:
+  replicas: 1
+  selector:
+  containers:
+  - name: opentelemetry-java-services
+    image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-java
+    env:
+    - name: SERVICE_CONFIG_PATH
+      value: /services
+    envFrom:
+    - configMapRef:
+        name: environment-variables
+    volumeMounts:
+    - name: settings
+      mountPath: /services
+  - name: brave-springboot-service
+    image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/brave-springboot-demo
+    envFrom:
+    - configMapRef:
+        name: environment-variables
+    volumeMounts:
+    - name: settings
+      mountPath: /services
+  - name: otel-collector-zipkin
+    image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/otel-collector-zipkin
+    envFrom:
+    - configMapRef:
+        name: environment-variables
+  volumes:
+  - name: settings
+    configMap:
+      name: config-services
+      items:
+      - key: ot-zipkin-context-propagte
+        path: ot-zipkin-context-propagte.toml

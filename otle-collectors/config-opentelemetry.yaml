@@ -1,0 +1,42 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:55680"
+      http:
+        endpoint: "0.0.0.0:55681"
+
+exporters:
+  logging/detail:
+    loglevel: debug
+  alibabacloud_logservice/sls-trace:
+    endpoint: "{endpoint}"
+    project: "{project}"
+    logstore: "{logstore}-traces"
+    access_key_id: "{access_key_id}"
+    access_key_secret: "{access_secret}"
+  alibabacloud_logservice/sls-metric:
+    endpoint: "{endpoint}"
+    project: "{project}"
+    logstore: "{logstore}-metrics"
+    access_key_id: "{access_key_id}"
+    access_key_secret: "{access_secret}"
+  alibabacloud_logservice/sls-log:
+    endpoint: "{endpoint}"
+    project: "{project}"
+    logstore: "{logstore}-logs"
+    access_key_id: "{access_key_id}"
+    access_key_secret: "{access_secret}"
+
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [logging/detail,alibabacloud_logservice/sls-trace]
+    metrics:
+      receivers: [otlp]
+      exporters: [alibabacloud_logservice/sls-metric]
+    logs:
+      receivers: [otlp]
+      exporters: [alibabacloud_logservice/sls-log]

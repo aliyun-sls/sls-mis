@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  otpl-collector:
+    image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/otel-collector-zipkin
+    environment:
+      - ACCESS_KEY_ID
+      - ACCESS_SECRET
+      - ENDPOINT
+      - PROJECT
+      - LOGSTORE
+    expose:
+      - "9411"
+
+  zipkin-images:
+    image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/brave-springboot-demo
+    environment:
+      - OTPL_COLLECTOR_ADDRESS=http://otpl-collector:9411
+      - SERVICE_NAME=brave-zipkin-demo
+    ports:
+      - 8080:8080
+    depends_on:
+      - otpl-collector

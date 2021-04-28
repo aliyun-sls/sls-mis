@@ -1,0 +1,19 @@
+receivers:
+  zipkin:
+    endpoint: 0.0.0.0:9411
+
+exporters:
+  logging/detail:
+    loglevel: debug
+  alibabacloud_logservice/sls-trace:
+    endpoint: "{endpoint}"
+    project: "{project}"
+    logstore: "{logstore}"
+    access_key_id: "{access_key_id}"
+    access_key_secret: "{access_secret}"
+
+service:
+  pipelines:
+    traces:
+      receivers: [zipkin]
+      exporters: [logging/detail,alibabacloud_logservice/sls-trace]

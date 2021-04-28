@@ -1,0 +1,19 @@
+receivers:
+  opencensus:
+    endpoint: 0.0.0.0:6850
+
+exporters:
+  logging/detail:
+    loglevel: debug
+  alibabacloud_logservice/sls-trace:
+    endpoint: "{endpoint}"
+    project: "{project}"
+    logstore: "{logstore}-traces"
+    access_key_id: "{access_key_id}"
+    access_key_secret: "{access_secret}"
+
+service:
+  pipelines:
+    traces:
+      receivers: [opencensus]
+      exporters: [logging/detail,alibabacloud_logservice/sls-trace]

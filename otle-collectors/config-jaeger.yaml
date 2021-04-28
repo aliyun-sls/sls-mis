@@ -1,0 +1,27 @@
+receivers:
+  jaeger:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:6831
+      thrift_binary:
+        endpoint: 0.0.0.0:6832
+      thrift_compact:
+        endpoint: 0.0.0.0:6833
+      thrift_http:
+        endpoint: 0.0.0.0:6834
+
+exporters:
+  logging/detail:
+    loglevel: debug
+  alibabacloud_logservice/sls-trace:
+    endpoint: "{endpoint}"
+    project: "{project}"
+    logstore: "{logstore}-traces"
+    access_key_id: "{access_key_id}"
+    access_key_secret: "{access_secret}"
+
+service:
+  pipelines:
+    traces:
+      receivers: [jaeger]
+      exporters: [logging/detail,alibabacloud_logservice/sls-trace]
