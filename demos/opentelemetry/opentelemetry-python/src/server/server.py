@@ -33,6 +33,8 @@ def start():
     def hello():
         tracer = trace.get_tracer(__name__)
         with tracer.start_as_current_span("request_server"):
+            span = trace.get_current_span();
+            span.set_attribute("Hello", "World")
             requests.get("http://www.baidu.com")
         return "hello world"
 
