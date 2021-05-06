@@ -3,7 +3,7 @@ ENV ACCESS_KEY_ID="" \
     ACCESS_KEY_SECRET="" \
     PROJECT="" \
     LOGSTORE="" \
-    ENDPOINT="" \
+    HTTPS_ENDPOINT="" \
     SERVICE_NAME="opentelementry-dotnet" \
     SERVICE_VERSION="1.0.0" \
     SERVICE_HOST="127.0.0.1" \
@@ -13,7 +13,7 @@ WORKDIR /opentelemetry-dotnet
 
 COPY *.sln .
 COPY . .
-COPY sources.list /etc/apt/sources.list
-RUN apt update && apt install -y libc-dev && dotnet restore
+RUN sed -i s@/deb.debian.org/@/mirrors.aliyun.com/@g /etc/apt/sources.list && apt-get clean \
+    && apt-get update && apt update && apt install -y libc-dev && dotnet restore
 
 CMD ["dotnet", "run", "--project", "WebApplication"]

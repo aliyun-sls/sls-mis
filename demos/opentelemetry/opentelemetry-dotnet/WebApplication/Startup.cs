@@ -31,9 +31,8 @@ namespace WebApplication
                     .AddAspNetCoreInstrumentation()
                     .AddOtlpExporter(options =>
                     {
-                        options.Endpoint = runningParameter.getEndpoint();
-                        options.Headers = runningParameter.buildHeader();
-                        options.Credentials = new SslCredentials();
+                        options.Endpoint = new Uri(runningParameter.getEndpoint());
+                        options.Headers = runningParameter.buildHeaderString();
                     })
                     .SetResourceBuilder(ResourceBuilder.CreateDefault()
                         .AddAttributes(new Dictionary<string, object>
