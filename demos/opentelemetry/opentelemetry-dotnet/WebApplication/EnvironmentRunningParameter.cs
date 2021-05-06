@@ -28,6 +28,11 @@ namespace WebApplication
             {
                 serviceName = "opentelemetry-donet";
             }
+
+            if (string.IsNullOrEmpty(serviceVersion))
+            {
+                serviceVersion = "1.1.0-beta2"
+            }
         }
 
         public override string getServiceVersion()

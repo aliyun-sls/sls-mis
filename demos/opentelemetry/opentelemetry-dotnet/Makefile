@@ -1,4 +1,4 @@
-DOTNET_IMAGE_VERSION := 1.0.0-rc1
+DOTNET_IMAGE_VERSION := 1.1.0-beta2
 DOTNET_IMAGE_NAME := sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-dotnet
 .PONY: clean clean_docker_image
 
