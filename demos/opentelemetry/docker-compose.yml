@@ -8,7 +8,7 @@ services:
       - ACCESS_SECRET
       - PROJECT
       - LOGSTORE
-      - ENDPOINT
+      - HTTPS_ENDPOINT
     ports:
       - 8083:8083
 

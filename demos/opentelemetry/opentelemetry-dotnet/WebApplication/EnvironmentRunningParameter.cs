@@ -17,7 +17,7 @@ namespace WebApplication
         {
             project = Environment.GetEnvironmentVariable("PROJECT");
             logstore = Environment.GetEnvironmentVariable("LOGSTORE");
-            endpoint = Environment.GetEnvironmentVariable("ENDPOINT");
+            endpoint = Environment.GetEnvironmentVariable("HTTPS_ENDPOINT");
             accessKeyId = Environment.GetEnvironmentVariable("ACCESS_KEY_ID");
             accessSecret = Environment.GetEnvironmentVariable("ACCESS_SECRET");
             serviceName = Environment.GetEnvironmentVariable("SERVICE_NAME");
