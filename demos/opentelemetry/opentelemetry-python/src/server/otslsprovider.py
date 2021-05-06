@@ -1,9 +1,9 @@
 import socket
 from opentelemetry import trace
-from opentelemetry.exporter.otlp.trace_exporter import OTLPSpanExporter
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
 from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchExportSpanProcessor
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 class OpenTelemetrySLSProvider(object):
 
@@ -36,5 +36,5 @@ class OpenTelemetrySLSProvider(object):
     def initTracer(self):
         otlp_exporter = OTLPSpanExporter(endpoint=self.endpoint)
         trace_provider = TracerProvider(resource=self.resource)
-        trace_provider.add_span_processor(BatchExportSpanProcessor(otlp_exporter))
+        trace_provider.add_span_processor(BatchSpanProcessor(otlp_exporter))
         trace.set_tracer_provider(trace_provider)
