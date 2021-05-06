@@ -1,5 +1,5 @@
 PYTHON_IMAGE_NAME := sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-python
-PYTHON_IMAGE_VERSION := 1.0.0rc1
+PYTHON_IMAGE_VERSION := 1.1.0
 
 
 build_project:
