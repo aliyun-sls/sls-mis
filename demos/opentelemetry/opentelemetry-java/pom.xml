@@ -79,7 +79,7 @@
                             <build>
                                 <dockerFile>${project.basedir}/Dockerfile</dockerFile>
                                 <tags>
-                                    <tag>${project.version}</tag>
+                                    <tag>${opentelemetry.version}</tag>
                                 </tags>
                             </build>
                         </image>

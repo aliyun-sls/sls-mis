@@ -4,8 +4,8 @@ ENV ACCESS_KEY_ID="" \
     PROJECT="" \
     LOGSTORE="" \
     ZIPKIN_ENDPOINT="" \
-    SERVICE_NAME="opentelementry-php" \
-    SERVICE_VERSION="1.0.0"
+    SERVICE_NAME="opentelementry-php-0.0.1" \
+    SERVICE_VERSION="0.0.1"
 
 WORKDIR /opentelemetry-php
 

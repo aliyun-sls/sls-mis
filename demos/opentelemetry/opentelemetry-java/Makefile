@@ -1,5 +1,5 @@
 JAVA_IMAGE_IMAGE := sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-java
-JAVA_IMAGE_VERSION := 1.0.0
+JAVA_IMAGE_VERSION := 1.1.0
 
 build_project:
 	./mvnw clean package

@@ -4,8 +4,8 @@ ENV ACCESS_KEY_ID="" \
     PROJECT="" \
     LOGSTORE="" \
     HTTPS_ENDPOINT="" \
-    SERVICE_NAME="opentelementry-dotnet" \
-    SERVICE_VERSION="1.0.0" \
+    SERVICE_NAME="opentelementry-dotnet-1.1.0-beta2" \
+    SERVICE_VERSION="1.1.0-beta2" \
     SERVICE_HOST="127.0.0.1" \
     LD_LIBRARY_PATH=/usr/local/lib
 

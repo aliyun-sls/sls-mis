@@ -1,5 +1,5 @@
 NODE_DOCKER_NAME := sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-node
-NODE_DOCKER_VERSION := 0.18.0
+NODE_DOCKER_VERSION := 0.18.2
 
 clean_images:
 	docker image prune -f
