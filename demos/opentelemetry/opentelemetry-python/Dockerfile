@@ -5,7 +5,7 @@ ENV ACCESS_KEY_ID="" \
     PROJECT="" \
     LOGSTORE="" \
     HTTPS_ENDPOINT="" \
-    SERVICE_NAME="opentelementry-python" \
+    SERVICE_NAME="opentelementry-python-1.1.0" \
     SERVICE_VERSION="1.1.0" \
     SERVICE_HOST="127.0.0.1"
 

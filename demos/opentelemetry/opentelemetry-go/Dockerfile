@@ -4,8 +4,8 @@ ENV ACCESS_KEY_ID="" \
     PROJECT="" \
     LOGSTORE="" \
     ENDPOINT="" \
-    SERVICE_NAME="opentelementry-go-demo" \
-    SERVICE_VERSION="1.0.0" \
+    SERVICE_NAME="opentelementry-go-0.16.0" \
+    SERVICE_VERSION="0.16.0" \
     SERVICE_HOST="127.0.0.1"
 
 WORKDIR /opentelemetry-go

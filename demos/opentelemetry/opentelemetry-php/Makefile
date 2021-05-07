@@ -9,12 +9,11 @@ build_image: clean_images
 clean_container:
 	docker container prune -f
 
-
-push_image:
+push_image: build_image
 	docker push $(PHP_IMAGE_NAME):$(PHP_IMAGE_VERSION)
 
 
-push_latest_image: 
+push_latest_image: build_image
 	docker push $(PHP_IMAGE_NAME):latest
 
 

@@ -2,7 +2,7 @@ GO_IMAGE_NAME := sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-g
 GO_IMAGE_VERSION := 0.16.0
 
 build_project:
-	export CGO_CFLAGS=-Wno-undef-prefix && env GOOS=linux GOARCH=arm go build -o main src/server.go
+	export CGO_CFLAGS=-Wno-undef-prefix && env GOOS=linux go build -o main src/server.go
 
 build_image: build_project
 	docker build -t $(GO_IMAGE_NAME):$(GO_IMAGE_VERSION) -t $(GO_IMAGE_NAME):latest .

@@ -31,7 +31,7 @@ namespace WebApplication
 
             if (string.IsNullOrEmpty(serviceVersion))
             {
-                serviceVersion = "1.1.0-beta2"
+                serviceVersion = "1.1.0-beta2";
             }
         }
 

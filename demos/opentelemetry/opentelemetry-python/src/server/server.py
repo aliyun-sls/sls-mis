@@ -14,8 +14,8 @@ def start():
     parser.add_argument("project", help="project name")
     parser.add_argument("logstore", help="logstore")
     parser.add_argument("endpoint", help="endpoint")
-    parser.add_argument("--service_name", default="opentelemetry-python", help="service name")
-    parser.add_argument("--service_version", default="1.0.0", help="service version")
+    parser.add_argument("--service_name", default="opentelemetry-python-1.1.0", help="service name")
+    parser.add_argument("--service_version", default="1.1.0", help="service version")
     args = parser.parse_args()
 
     sls_ot_provider = OpenTelemetrySLSProvider(access_key_id= args.access_key_id, access_secret= args.access_secret,

@@ -8,7 +8,7 @@ from opentelemetry.sdk.trace.export import BatchSpanProcessor
 class OpenTelemetrySLSProvider(object):
 
     def __init__(self, access_key_id=None, access_secret=None, project=None, logstore=None,
-                 endpoint=None,  service_name="opentelemetry-python", service_version="1.0.0"):
+                 endpoint=None,  service_name=None, service_version=None):
         print("Running parameteres: ")
         print("- accessKeyID: ", access_key_id)
         print("- accessSecret: ", access_secret)

@@ -7,10 +7,10 @@ clean_images:
 build_image: clean_images
 	docker build -t $(NODE_DOCKER_NAME):$(NODE_DOCKER_VERSION) -t $(NODE_DOCKER_NAME):latest .
 
-push_image: build_images
+push_image: build_image
 	docker push $(NODE_DOCKER_NAME):$(NODE_DOCKER_VERSION)
 
-push_latest_image: build_images
+push_latest_image: build_image
 	docker push $(NODE_DOCKER_NAME):latest
 
 push_images: push_image push_latest_image
