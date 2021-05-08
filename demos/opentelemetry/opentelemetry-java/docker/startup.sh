@@ -30,4 +30,4 @@ echo "- SERVICE_VERSION: $SERVICE_VERSION"
 echo "- SERVICE_HOST: $SERVICE_HOST"
 echo "- SERVICE_CONFIG_PATH: $SERVICE_CONFIG_PATH"
 
-java -javaagent:${DEPLOY_HOME}/opentelemetry-javaagent-all.jar -Dservice.path=${SERVICE_CONFIG_PATH} -Dotel.resource.attributes=service.name=${SERVICE_NAME},service.version=${SERVICE_VERSION},host.name=${SERVICE_HOST} -jar ${DEPLOY_HOME}/opentelemetry-java.jar
+java -javaagent:${DEPLOY_HOME}/opentelemetry-javaagent-all.jar -Dotel.propagators=b3,jaeger -Dservice.path=${SERVICE_CONFIG_PATH} -Dotel.resource.attributes=service.name=${SERVICE_NAME},service.version=${SERVICE_VERSION},host.name=${SERVICE_HOST} -jar ${DEPLOY_HOME}/opentelemetry-java.jar
