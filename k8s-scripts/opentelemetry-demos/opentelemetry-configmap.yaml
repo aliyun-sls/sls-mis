@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: environment-variables
+  namespace: opentelemetry
+data:
+  ACCESS_KEY_ID: <YOUR_ACCESS_KEY_ID>
+  ACCESS_SECRET: <YOUR_ACCESS_SECRET>
+  ENDPOINT: <YOUR_ENDPOINT>
+  HTTPS_ENDPOINT: <YOUR_HTTPS_ENDPOINT>
+  PROJECT: <YOUR_PROJECT>
+  LOGSTORE: <YOUR_LOGSTORE>

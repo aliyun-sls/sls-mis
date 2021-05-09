@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentelemetry-java
+  namespace: opentelemetry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      demo: opentelemetry-java
+  template:
+    metadata:
+      labels:
+        demo: opentelemetry-java
+    spec:
+      containers:
+      - name: opentelemetry-java
+        image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-java
+        envFrom:
+        - configMapRef:
+            name: environment-variables
+        ports:
+        - containerPort: 8085
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opentelemetry-java
+  namespace: opentelemetry
+spec:
+  type: NodePort
+  ports:
+  - port: 8085
+    targetPort: 8085
+    protocol: TCP
+    nodePort: 30001
+  selector:
+    demo: opentelemetry-java

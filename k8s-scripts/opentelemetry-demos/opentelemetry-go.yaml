@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openelemetry-go
+  namespace: opentelemetry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      demo: openelemetry-go
+  template:
+    metadata:
+      labels:
+        demo: openelemetry-go
+    spec:
+      containers:
+      - name: openelemetry-go
+        image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/openelemetry-go
+        envFrom:
+        - configMapRef:
+            name: environment-variables
+        ports:
+        - containerPort: 8084
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openelemetry-go
+  namespace: opentelemetry
+spec:
+  type: NodePort
+  ports:
+  - port: 8084
+    targetPort: 8084
+    protocol: TCP
+    nodePort: 30003
+  selector:
+    demo: openelemetry-go

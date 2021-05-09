@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opentelemetry-dotnet
+  namespace: opentelemetry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      demo: opentelemetry-dotnet
+  template:
+    metadata:
+      labels:
+        demo: opentelemetry-dotnet
+    spec:
+      containers:
+      - name: opentelemetry-dotnet
+        image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/opentelemetry-dotnet
+        envFrom:
+        - configMapRef:
+            name: environment-variables
+        ports:
+        - containerPort: 8083
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opentelemetry-dotnet
+  namespace: opentelemetry
+spec:
+  type: NodePort
+  ports:
+  - port: 8083
+    targetPort: 8083
+    protocol: TCP
+    nodePort: 30002
+  selector:
+    demo: opentelemetry-dotnet
