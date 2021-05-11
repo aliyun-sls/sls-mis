@@ -28,7 +28,7 @@ export OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 export OTEL_EXPORTER_OTLP_ENDPOINT=${ENDPOINT}
 export OTEL_EXPORTER_OTLP_COMPRESSION=gzip
 export OTEL_EXPORTER_OTLP_HEADERS=x-sls-otel-project=${PROJECT},x-sls-otel-instance-id=${LOGSTORE},x-sls-otel-ak-id=${ACCESS_KEY_ID},x-sls-otel-ak-secret=${ACCESS_SECRET}
-java -javaagent:$PWD/target/opentelemetry-javaagent-all.jar -Dotel.resource.attributes=service.name=${SERVICE_NAME},service.version=${SERVICE_VERSION},host.name=${SERVICE_HOST} -jar ${DEPLOY_HOME}/opentelemetry-java.jar
+java -javaagent:$PWD/target/opentelemetry-javaagent-all.jar -Dotel.resource.attributes=service.name=${SERVICE_NAME},service.version=${SERVICE_VERSION},host.name=${SERVICE_HOST} -jar $PWD/target/opentelemetry-java.jar
 ```
 
 3. 访问服务
