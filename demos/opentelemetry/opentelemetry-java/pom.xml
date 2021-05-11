@@ -28,11 +28,6 @@
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.alibaba.sls.demo</groupId>
-            <artifactId>services-pipeline-parser-for-java</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 
     <build>
