@@ -8,7 +8,8 @@ Opentelemetry Go Demo 采用 Opentelemetry Go 手动探针采集 Trace 数据，
 
 ```shell
 export PROJECT=<PROJECT_NAME>
-export LOGSTORE=<LOGSTORE_NAME>
+export ENDPOINT=<ENDPOINT>
+export INSTANCE=<TRACE_INSTANCE_ID>
 export ACCESS_KEY_ID=<ACCESS_KEY_ID>
 export ACCESS_SECRET=<ACCESS_SECRET>
 export SERVICE_NAME=opentelemetry-go
