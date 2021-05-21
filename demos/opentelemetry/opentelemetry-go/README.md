@@ -15,17 +15,19 @@ export SERVICE_NAME=opentelemetry-go
 export SERVICE_VERSION=1.0.0
 export SERVICE_HOST=127.0.0.1
 
-go build -o main src/server.go
+go build
 ```
 
 2. 启动服务
 
 ```shell
-./main
+./opentelemetry-go-demo
 ```
 
 3. 访问服务
 
 ```shell
 curl http://localhost:8084/hello-world
+curl http://localhost:8084/save-order\?orderID=123
+curl http://localhost:8084/save-order\?orderID=123x
 ```
