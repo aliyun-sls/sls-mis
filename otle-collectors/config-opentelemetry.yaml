@@ -12,19 +12,19 @@ exporters:
   alibabacloud_logservice/sls-trace:
     endpoint: "{endpoint}"
     project: "{project}"
-    logstore: "{logstore}-traces"
+    instance: "{instance}-traces"
     access_key_id: "{access_key_id}"
     access_key_secret: "{access_secret}"
   alibabacloud_logservice/sls-metric:
     endpoint: "{endpoint}"
     project: "{project}"
-    logstore: "{logstore}-metrics"
+    instance: "{instance}-metrics"
     access_key_id: "{access_key_id}"
     access_key_secret: "{access_secret}"
   alibabacloud_logservice/sls-log:
     endpoint: "{endpoint}"
     project: "{project}"
-    logstore: "{logstore}-logs"
+    instance: "{instance}-logs"
     access_key_id: "{access_key_id}"
     access_key_secret: "{access_secret}"
 
