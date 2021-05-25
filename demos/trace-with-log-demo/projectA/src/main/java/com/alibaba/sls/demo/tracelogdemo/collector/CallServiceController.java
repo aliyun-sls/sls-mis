@@ -20,20 +20,20 @@ public class CallServiceController {
     private ProjectBServices projectBServices;
 
     @RequestMapping("/normal-trace")
-    public List forNormalTrace(@PathVariable(name = "name", required = false) String name) {
+    public List forNormalTrace(String name) {
         logger.info("Call forNormalTrace Service: {}", name);
         return projectBServices.normalTrace(name);
     }
 
-    @RequestMapping("/slow-trace/{name}")
-    public List forSlowTrace(@PathVariable(name = "name", required = false) String name) throws Exception {
+    @RequestMapping("/slow-trace")
+    public List forSlowTrace(String name) throws Exception {
         logger.info("Call forSlowTrace Service: {}", name);
         Thread.sleep(ThreadLocalRandom.current().nextInt(100, 500));
         return projectBServices.slowTrace(name);
     }
 
-    @RequestMapping("/error-trace/{name}")
-    public List forErrorTrace(@PathVariable(name = "name", required = false) String name) {
+    @RequestMapping("/error-trace")
+    public List forErrorTrace(String name) {
         logger.info("Call forErrorTrace Service: {}", name);
         return projectBServices.errorTrace(name);
     }
