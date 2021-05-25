@@ -1,26 +1,29 @@
 package com.alibaba.sls.demo.tracelogdemo.entity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
-@Table(name = "T_CUSTOMER")
-public class Customer {
+@Table(name = "T_ORDER")
+public class Order {
     @Id
-    @GeneratedValue
     private int id;
 
     @Column(name = "name")
     private String name;
 
-    public Customer() {
+    public Order() {
     }
 
-    public Customer(String name) {
+    public Order(int id, String name) {
+        this.id = id;
         this.name = name;
     }
 
-    public static Customer from(String name) {
-        return new Customer(name);
+    public Order(String name) {
+        this.name = name;
     }
 
     public void setId(int id) {
