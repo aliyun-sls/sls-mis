@@ -10,7 +10,6 @@
 
     <name>shipping</name>
     <description>Shipping service for microservices-demo application</description>
-
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -143,7 +142,8 @@
                             <build>
                                 <dockerFile>${project.basedir}/Dockerfile</dockerFile>
                                 <tags>
-                                    <tag>${project.version}</tag>
+                                    <tag>1.0.0</tag>
+                                    <tag>latest</tag>
                                 </tags>
                             </build>
                         </image>

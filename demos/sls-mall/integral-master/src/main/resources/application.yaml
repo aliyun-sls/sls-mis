@@ -11,9 +11,6 @@ spring:
     url: jdbc:mysql://integral-db:3306/integral?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
     username: integral
     password: default_password
-  zipkin:
-    baseUrl: http://${zipkin_host:zipkin}:9411/
-    enabled: ${zipkin_enabled:false}
   sleuth:
     sampler:
       percentage: 1.0

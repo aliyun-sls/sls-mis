@@ -7,6 +7,7 @@ ENV PROJECT="" \
 
 WORKDIR /sls-mall
 COPY target/queue-master.jar ./app.jar
-COPY target/opentelemetry-javaagent-all.jar startup.sh ./
+COPY target/opentelemetry-javaagent-all.jar .
+COPY startup.sh .
 RUN chmod +x startup.sh
 CMD ["/sls-mall/startup.sh"]
