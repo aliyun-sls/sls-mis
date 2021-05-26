@@ -7,7 +7,8 @@ ENV PROJECT=PROJECT_NAME \
     ACCESS_SECRET=ACCESS_SECRET \
     SERVICE_NAME="projectA" \
     SERVICE_VERSION="1.0.0" \
-    SERVICE_HOST="127.0.0.1"
+    SERVICE_HOST="127.0.0.1" \
+    PROJECTB_HOST="projectb"
 
 WORKDIR /trace-with-log-demo
 
