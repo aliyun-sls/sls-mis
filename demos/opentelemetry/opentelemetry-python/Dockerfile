@@ -3,8 +3,8 @@ FROM python:3.9.4-slim
 ENV ACCESS_KEY_ID="" \
     ACCESS_SECRET="" \
     PROJECT="" \
-    LOGSTORE="" \
-    HTTPS_ENDPOINT="" \
+    INSTANCE="" \
+    ENDPOINT="" \
     SERVICE_NAME="opentelementry-python-1.1.0" \
     SERVICE_VERSION="1.1.0" \
     SERVICE_HOST="127.0.0.1"
