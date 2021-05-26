@@ -23,7 +23,7 @@ export PROJECT=<PROJECT_NAME>
 export INSTANCE=<LOGSTORE_NAME>
 export ENDPOINT=<ENDPOINT>
 export SERVICE_NAME=opentelemetry-dotnet
-export SERVICE_VERSION=1.0.0
+export SERVICE_VERSION=v1.0.0
 export SERVICE_HOST=127.0.0.1
 
 dotnet run --project WebApplication

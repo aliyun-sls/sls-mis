@@ -9,7 +9,7 @@ use OpenTelemetry\Sdk\Trace\TracerProvider;
 
 $endpoint = getenv('ZIPKIN_ENDPOINT');
 $project = getenv('PROJECT');
-$logstore = getenv('LOGSTORE');
+$instance = getenv('INSTANCE');
 $accessKeyId = getenv('ACCESS_KEY_ID');
 $accessSecret = getenv('ACCESS_SECRET');
 
@@ -17,14 +17,14 @@ $serviceName = getenv('SERVICE_NAME');
 $serviceVersion = getenv('SERVICE_VERSION');
 
 if ($serviceName == '') {
-    $serviceName = 'Opentelemetry-Php';
+    $serviceName = 'Opentelemetry-PHP';
 }
 
 if ($serviceVersion == '') {
-    $serviceVersion = '0.0.1';
+    $serviceVersion = 'v1.0.0';
 }
 
-$exporter = new Exporter($serviceName, $endpoint, $project, $logstore, $accessKeyId, $accessSecret);
+$exporter = new Exporter($serviceName, $endpoint, $project, $instance, $accessKeyId, $accessSecret);
 $tracer = (new TracerProvider())->addSpanProcessor(new SimpleSpanProcessor($exporter))->getTracer($serviceName);
 
 $timestamp = Clock::get()->timestamp();

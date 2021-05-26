@@ -20,10 +20,10 @@ class Exporter implements Trace\Exporter
     private $running = true;
     private $client;
 
-    public function __construct(string $serviceName, string $endpointUrl, string $project, string $logstore, string $accessKeyId, string $accessSecret)
+    public function __construct(string $serviceName, string $endpointUrl, string $project, string $instance, string $accessKeyId, string $accessSecret)
     {
         $this->endpointUrl = $endpointUrl;
-        $this->client = $client ?? $this->createClient($project, $logstore, $accessKeyId, $accessSecret);
+        $this->client = $client ?? $this->createClient($project, $instance, $accessKeyId, $accessSecret);
         $this->spanConverter = new SpanConverter($serviceName);
     }
 
@@ -68,7 +68,7 @@ class Exporter implements Trace\Exporter
         $this->running = false;
     }
 
-    protected function createClient(string $project, string $logstore, string $accessKeyId, string $accessSecret): ClientInterface
+    protected function createClient(string $project, string $instance, string $accessKeyId, string $accessSecret): ClientInterface
     {
         $container = [];
         $history = Middleware::history($container);
@@ -80,7 +80,7 @@ class Exporter implements Trace\Exporter
             'timeout' => 30,
             'headers' => [
                 'x-sls-otel-project' => $project,
-                'x-sls-otel-instance-id' => $logstore,
+                'x-sls-otel-instance-id' => $instance,
                 'x-sls-otel-ak-id' => $accessKeyId,
                 'x-sls-otel-ak-secret' => $accessSecret
             ]
