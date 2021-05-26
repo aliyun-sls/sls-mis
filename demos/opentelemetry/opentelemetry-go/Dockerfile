@@ -2,7 +2,7 @@ FROM golang
 ENV ACCESS_KEY_ID="" \
     ACCESS_KEY_SECRET="" \
     PROJECT="" \
-    LOGSTORE="" \
+    INSTANCE="" \
     ENDPOINT="" \
     SERVICE_NAME="opentelementry-go-0.16.0" \
     SERVICE_VERSION="0.16.0" \
