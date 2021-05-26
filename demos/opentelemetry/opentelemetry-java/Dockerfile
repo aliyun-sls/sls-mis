@@ -4,9 +4,9 @@ ENV DEPLOY_HOME="/opentelemetry" \
     ACCESS_SECRET="" \
     PROJECT="" \
     LOGSTORE="" \
-    HTTPS_ENDPOINT="" \
+    ENDPOINT="" \
     SERVICE_NAME="opentelementry-java-1.1.0" \
-    SERVICE_VERSION="1.1.0" \
+    SERVICE_VERSION="v1.1.0" \
     SERVICE_HOST="127.0.0.1" \
     SERVICE_CONFIG_PATH=""
 

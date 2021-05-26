@@ -21,7 +21,7 @@ module.exports = (parameter) => {
     });
     var meta = new grpc.Metadata();
     meta.add('x-sls-otel-project', parameter.project);
-    meta.add('x-sls-otel-instance-id', parameter.logstore);
+    meta.add('x-sls-otel-instance-id', parameter.instance);
     meta.add('x-sls-otel-ak-id', parameter.access_key_id);
     meta.add('x-sls-otel-ak-secret', parameter.access_secret);
     const collectorOptions = {

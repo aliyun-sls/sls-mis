@@ -20,7 +20,7 @@ export PROJECT=<PROJECT_NAME>
 export INSTANCE=<INSTANCE_NAME>
 export ENDPOINT=<ENDPOINT>
 export SERVICE_NAME=opentelemetry-python
-export SERVICE_VERSION=1.0.0
+export SERVICE_VERSION=v1.0.0
 
 poetry run start --service-name=${SERVICE_NAME} --service-version=${SERVICE_VERSION} ${ACCESS_KEY_ID} ${ACCESS_SECRET} ${PROJECT} ${INSTANCE} ${ENDPOINT}
 ```

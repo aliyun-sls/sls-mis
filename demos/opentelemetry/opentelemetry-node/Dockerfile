@@ -2,10 +2,10 @@ FROM node:12.19.1-alpine
 ENV ACCESS_KEY_ID="" \
     ACCESS_KEY_SECRET="" \
     PROJECT="" \
-    LOGSTORE="" \
+    INSTANCE="" \
     ENDPOINT="" \
     SERVICE_NAME="opentelementry-node-0.18.2" \
-    SERVICE_VERSION="0.18.2" \
+    SERVICE_VERSION="v0.18.2" \
     SERVICE_HOST="127.0.0.1"
 
 WORKDIR /opentelemetry-node

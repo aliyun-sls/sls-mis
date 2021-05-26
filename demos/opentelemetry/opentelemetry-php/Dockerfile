@@ -5,7 +5,7 @@ ENV ACCESS_KEY_ID="" \
     INSTANCE="" \
     ZIPKIN_ENDPOINT="" \
     SERVICE_NAME="opentelementry-php-0.0.1" \
-    SERVICE_VERSION="0.0.1"
+    SERVICE_VERSION="v0.0.1"
 
 WORKDIR /opentelemetry-php
 

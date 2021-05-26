@@ -5,7 +5,7 @@ ENV ACCESS_KEY_ID="" \
     INSTANCE="" \
     ENDPOINT="" \
     SERVICE_NAME="opentelementry-go-0.16.0" \
-    SERVICE_VERSION="0.16.0" \
+    SERVICE_VERSION="v0.16.0" \
     SERVICE_HOST="127.0.0.1"
 
 WORKDIR /opentelemetry-go
