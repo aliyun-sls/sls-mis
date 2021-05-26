@@ -6,7 +6,7 @@ ENV PROJECT="" \
     ENDPOINT=""
 
 WORKDIR /sls-mall
-COPY target/carts.jar ./app.jar
+COPY target/orders.jar ./app.jar
 COPY target/opentelemetry-javaagent-all.jar startup.sh ./
 RUN chmod +x startup.sh
 CMD ["/sls-mall/startup.sh"]
