@@ -2,7 +2,7 @@ FROM sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/dotnet/sdk:5.0-buster-slim
 ENV ACCESS_KEY_ID="" \
     ACCESS_KEY_SECRET="" \
     PROJECT="" \
-    LOGSTORE="" \
+    INSTANCE="" \
     HTTPS_ENDPOINT="" \
     SERVICE_NAME="opentelementry-dotnet-1.1.0-beta2" \
     SERVICE_VERSION="1.1.0-beta2" \

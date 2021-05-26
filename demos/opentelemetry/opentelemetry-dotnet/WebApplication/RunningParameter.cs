@@ -9,7 +9,7 @@ namespace WebApplication
 
         string getServiceName();
 
-        string getLogstore();
+        string GetInstance();
 
         string getAccessKeyId();
 

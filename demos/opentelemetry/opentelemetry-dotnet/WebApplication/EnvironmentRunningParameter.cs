@@ -5,7 +5,7 @@ namespace WebApplication
     public class EnvironmentRunningParameter : AbstractRunningParameter
     {
         private readonly string project;
-        private readonly string logstore;
+        private readonly string instance;
         private readonly string endpoint;
         private readonly string accessKeyId;
         private readonly string accessSecret;
@@ -16,7 +16,7 @@ namespace WebApplication
         public EnvironmentRunningParameter()
         {
             project = Environment.GetEnvironmentVariable("PROJECT");
-            logstore = Environment.GetEnvironmentVariable("LOGSTORE");
+            instance = Environment.GetEnvironmentVariable("INSTANCE");
             endpoint = Environment.GetEnvironmentVariable("HTTPS_ENDPOINT");
             accessKeyId = Environment.GetEnvironmentVariable("ACCESS_KEY_ID");
             accessSecret = Environment.GetEnvironmentVariable("ACCESS_SECRET");
@@ -55,9 +55,9 @@ namespace WebApplication
             return serviceName;
         }
 
-        public override string getLogstore()
+        public override string GetInstance()
         {
-            return logstore;
+            return instance;
         }
 
         public override string getAccessKeyId()
