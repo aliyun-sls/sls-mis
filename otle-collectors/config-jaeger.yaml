@@ -16,7 +16,7 @@ exporters:
   alibabacloud_logservice/sls-trace:
     endpoint: "{endpoint}"
     project: "{project}"
-    instance: "{instance}-traces"
+    logstore: "{instance}-traces"
     access_key_id: "{access_key_id}"
     access_key_secret: "{access_secret}"
 
