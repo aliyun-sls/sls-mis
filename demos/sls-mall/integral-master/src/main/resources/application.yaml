@@ -15,7 +15,7 @@ spring:
     sampler:
       percentage: 1.0
 server:
-  port: ${port:8089}
+  port: ${port:8091}
 endpoints:
   metrics:
     enabled: false
