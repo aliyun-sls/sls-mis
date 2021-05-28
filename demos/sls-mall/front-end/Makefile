@@ -1,72 +1,13 @@
-IMAGE=front-end
-DOCKER_IFLAG := $(if $(GITHUB_ACTIONS),"-i","-it")
+IMAGE_NAME = sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/front-end
+IMAGE_VERSION = 1.0.0
 
-.PHONY: test coverage docker
+build_image:
+	@docker build -t $(IMAGE_NAME):$(IMAGE_VERSION) -t $(IMAGE_NAME):latest .
 
-default: docker
+push_image: build_image
+	@docker push $(IMAGE_NAME):$(IMAGE_VERSION)
 
-up: compose test-image deps server
+push_latest_image: build_image
+	@docker push $(IMAGE_NAME):latest
 
-down: kill-server kill-compose
-
-dev: clean test-image server
-
-# Brings the backend services up using Docker Compose
-compose:
-	@docker-compose -f test/docker-compose.yml up -d
-
-# Installs Node.js project dependencies
-deps:
-	@docker run               \
-		-it                     \
-		--rm                    \
-		-v $$PWD:/usr/src/app   \
-		$(IMAGE) /usr/local/bin/npm install
-
-# Runs the Node.js application in a Docker container
-server:
-	@docker run               \
-		-d                      \
-		--name $(IMAGE)     \
-		-v $$PWD:/usr/src/app   \
-		-P                      \
-		-e NODE_ENV=development \
-		-e PORT=8080            \
-		-p 8080:8080            \
-		--network test_default  \
-		$(IMAGE) /usr/local/bin/npm start
-
-# Removes the development container & image
-clean:
-	@if [ $$(docker ps -a -q -f name=$(IMAGE) | wc -l) -ge 1 ]; then docker rm -f $(IMAGE); fi
-	@if [ $$(docker images -q $(IMAGE) | wc -l) -ge 1 ]; then docker rmi $(IMAGE); fi
-
-docker:
-	@docker build -t sls-microservices/front-end  .
-
-# Builds the Docker image used for running tests
-test-image:
-	@docker build -t $(IMAGE) -f test/Dockerfile .
-
-# Runs unit tests in Docker
-test: test-image
-	@docker run              \
-		--rm                   \
-		$(DOCKER_IFLAG)                    \
-		-v $$PWD:/usr/src/app  \
-		$(IMAGE) /usr/local/bin/npm test
-
-# Runs integration tests in Docker
-e2e: test-image
-	@docker run              \
-		--rm                   \
-		-it                    \
-		--network test_default \
-		-v $$PWD:/usr/src/app  \
-		$(IMAGE) /usr/src/app/test/e2e/runner.sh
-
-kill-compose:
-	@docker-compose -f test/docker-compose.yml down
-
-kill-server:
-	@if [ $$(docker ps -a -q -f name=$(IMAGE) | wc -l) -ge 1 ]; then docker rm -f $(IMAGE); fi
+push_images: push_latest_image push_image

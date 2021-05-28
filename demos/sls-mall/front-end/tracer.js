@@ -1,34 +1,38 @@
+'use strict';
+
 const opentelemetry = require('@opentelemetry/api');
-const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { NodeTracerProvider } = require('@opentelemetry/node');
-const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector-grpc');
+const {registerInstrumentations} = require('@opentelemetry/instrumentation');
+const {NodeTracerProvider} = require('@opentelemetry/node');
+const {SimpleSpanProcessor, ConsoleSpanExporter} = require('@opentelemetry/tracing');
+const grpc = require('grpc');
+const {CollectorTraceExporter} = require('@opentelemetry/exporter-collector-grpc');
 
-module.exports = (serviceName, url) => {
-  const collectorOptions = {
-    serviceName: serviceName,
-    url: url // url is optional and can be omitted - default is localhost:4317
-  };
-  
-  console.log("serviceName : " + serviceName + ", url : " + url)
+const {ExpressInstrumentation} = require('@opentelemetry/instrumentation-express');
+const {HttpInstrumentation} = require('@opentelemetry/instrumentation-http');
 
-  const exporter = new CollectorTraceExporter(collectorOptions);
-  const provider = new NodeTracerProvider({
-    plugins: {
-      http: {
-        enabled: true,
-        path: '@opentelemetry/plugin-http',
-        requestHook: (span, request) => {
-          //console.log(span)
-          //span.setAttribute("custom request hook attribute", "request");
-        },
-      },
-      express: {
-        enabled: true,
-        path: '@opentelemetry/plugin-express',
-      },
-    }
-  });
-  provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
-  provider.register();
-  return opentelemetry.trace.getTracer("front-end");
+module.exports = (parameter) => {
+    const provider = new NodeTracerProvider();
+    registerInstrumentations({
+        tracerProvider: provider,
+        instrumentations: [
+            HttpInstrumentation,
+            ExpressInstrumentation,
+        ],
+    });
+    var meta = new grpc.Metadata();
+    meta.add('x-sls-otel-project', parameter.project);
+    meta.add('x-sls-otel-instance-id', parameter.instance);
+    meta.add('x-sls-otel-ak-id', parameter.access_key_id);
+    meta.add('x-sls-otel-ak-secret', parameter.access_secret);
+    const collectorOptions = {
+        serviceName: parameter.service_name,
+        url: parameter.endpoint,
+        credentials: grpc.credentials.createSsl(),
+        metadata: meta
+    };
+
+    const exporter = new CollectorTraceExporter(collectorOptions);
+    provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+    provider.register();
+    return opentelemetry.trace.getTracer(parameter.service_name);
 };

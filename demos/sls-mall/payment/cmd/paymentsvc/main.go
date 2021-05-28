@@ -31,7 +31,6 @@ var otlpEndpoint string
 
 var (
 	port          = flag.String("port", "8080", "Port to bind HTTP listener")
-	zip           = flag.String("zipkin", os.Getenv("ZIPKIN"), "Zipkin address")
 	declineAmount = flag.Float64("decline", 105, "Decline payments over certain amount")
 )
 

@@ -40,7 +40,7 @@
                     <skip>false</skip>
                     <images>
                         <image>
-                            <name>sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/trace-with-log-demo/projecta</name>
+                            <name>sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/trace-with-log-demo/frontend</name>
                             <build>
                                 <dockerFile>${project.basedir}/Dockerfile</dockerFile>
                                 <tags>

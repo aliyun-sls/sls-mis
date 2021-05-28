@@ -1,20 +1,16 @@
-NAME = sls-microservices/payment
-INSTANCE = payment
+IMAGE_NAME = sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/payment
+IMAGE_VERSION = 1.0.0
 
-.PHONY: default copy test docker
-
-default: docker
-
-copy:
-	docker create --name $(INSTANCE) $(NAME)-dev
-	docker cp $(INSTANCE):/app $(shell pwd)/app
-	docker rm $(INSTANCE)
-
-docker:
+build_project:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app ./cmd/paymentsvc
-	docker build -t $(NAME) -f ./docker/payment/Dockerfile-release .
 
-test:
-	GROUP=sls-microservices COMMIT=$(COMMIT) ./scripts/build.sh
-	./test/test.sh unit.py
-	./test/test.sh container.py --tag $(COMMIT)
+build_images: build_project
+	docker build -t $(IMAGE_NAME):$(IMAGE_VERSION) -t $(IMAGE_NAME):latest .
+
+push_image: build_images
+	docker push $(IMAGE_NAME):$(IMAGE_VERSION)
+
+push_latest_image: build_images
+	docker push $(IMAGE_NAME):latest
+
+push_images: push_image push_latest_image
