@@ -36,6 +36,15 @@ def start():
     FlaskInstrumentor().instrument_app(app)
     RequestsInstrumentor().instrument()
 
+    @app.route("/hello-world")
+    def hello():
+        tracer = trace.get_tracer(__name__)
+        with tracer.start_as_current_span("request_server"):
+            span = trace.get_current_span();
+            span.set_attribute("Hello", "World")
+            requests.get("http://www.taobao.com")
+        return "hello world"
+
     @app.route("/save-order")
     def save_order():
         ret = {"code": 200, "msg": "", "data": ""}
