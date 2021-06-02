@@ -7,14 +7,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/sls-mis/demos/sls-mall/user/opentelemetry"
 	"net/http"
 	"strings"
 
 	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/tracing/opentracing"
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
-	stdopentracing "github.com/opentracing/opentracing-go"
 	"github.com/sls-mis/demos/sls-mall/user/users"
 )
 
@@ -23,7 +22,7 @@ var (
 )
 
 // MakeHTTPHandler mounts the endpoints into a REST-y HTTP handler.
-func MakeHTTPHandler(e Endpoints, logger log.Logger, tracer stdopentracing.Tracer) *mux.Router {
+func MakeHTTPHandler(e Endpoints, logger log.Logger) *mux.Router {
 	r := mux.NewRouter().StrictSlash(false)
 	options := []httptransport.ServerOption{
 		httptransport.ServerErrorLogger(logger),
@@ -33,66 +32,65 @@ func MakeHTTPHandler(e Endpoints, logger log.Logger, tracer stdopentracing.Trace
 	// GET /login       Login
 	// GET /register    Register
 	// GET /health      Health Check
-
 	r.Methods("GET").Path("/login").Handler(httptransport.NewServer(
 		e.LoginEndpoint,
 		decodeLoginRequest,
 		encodeResponse,
-		append(options, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "GET /login", logger)))...,
+		append(options, httptransport.ServerBefore(opentelemetry.HTTPToContext("GET /login", logger)))...,
 	))
 	r.Methods("POST").Path("/register").Handler(httptransport.NewServer(
 		e.RegisterEndpoint,
 		decodeRegisterRequest,
 		encodeResponse,
-		append(options, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "POST /register", logger)))...,
+		append(options, httptransport.ServerBefore(opentelemetry.HTTPToContext("POST /register", logger)))...,
 	))
 	r.Methods("GET").PathPrefix("/customers").Handler(httptransport.NewServer(
 		e.UserGetEndpoint,
 		decodeGetRequest,
 		encodeResponse,
-		append(options, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "GET /customers", logger)))...,
+		append(options, httptransport.ServerBefore(opentelemetry.HTTPToContext("GET /customers", logger)))...,
 	))
 	r.Methods("GET").PathPrefix("/cards").Handler(httptransport.NewServer(
 		e.CardGetEndpoint,
 		decodeGetRequest,
 		encodeResponse,
-		append(options, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "GET /cards", logger)))...,
+		append(options, httptransport.ServerBefore(opentelemetry.HTTPToContext("GET /cards", logger)))...,
 	))
 	r.Methods("GET").PathPrefix("/addresses").Handler(httptransport.NewServer(
 		e.AddressGetEndpoint,
 		decodeGetRequest,
 		encodeResponse,
-		append(options, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "GET /addresses", logger)))...,
+		append(options, httptransport.ServerBefore(opentelemetry.HTTPToContext("GET /addresses", logger)))...,
 	))
 	r.Methods("POST").Path("/customers").Handler(httptransport.NewServer(
 		e.UserPostEndpoint,
 		decodeUserRequest,
 		encodeResponse,
-		append(options, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "POST /customers", logger)))...,
+		append(options, httptransport.ServerBefore(opentelemetry.HTTPToContext("POST /customers", logger)))...,
 	))
 	r.Methods("POST").Path("/addresses").Handler(httptransport.NewServer(
 		e.AddressPostEndpoint,
 		decodeAddressRequest,
 		encodeResponse,
-		append(options, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "POST /addresses", logger)))...,
+		append(options, httptransport.ServerBefore(opentelemetry.HTTPToContext("POST /addresses", logger)))...,
 	))
 	r.Methods("POST").Path("/cards").Handler(httptransport.NewServer(
 		e.CardPostEndpoint,
 		decodeCardRequest,
 		encodeResponse,
-		append(options, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "POST /cards", logger)))...,
+		append(options, httptransport.ServerBefore(opentelemetry.HTTPToContext("POST /cards", logger)))...,
 	))
 	r.Methods("DELETE").PathPrefix("/").Handler(httptransport.NewServer(
 		e.DeleteEndpoint,
 		decodeDeleteRequest,
 		encodeResponse,
-		append(options, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "DELETE /", logger)))...,
+		append(options, httptransport.ServerBefore(opentelemetry.HTTPToContext("DELETE /", logger)))...,
 	))
 	r.Methods("GET").PathPrefix("/health").Handler(httptransport.NewServer(
 		e.HealthEndpoint,
 		decodeHealthRequest,
 		encodeHealthResponse,
-		append(options, httptransport.ServerBefore(opentracing.HTTPToContext(tracer, "GET /health", logger)))...,
+		append(options, httptransport.ServerBefore(opentelemetry.HTTPToContext("GET /health", logger)))...,
 	))
 	return r
 }

@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/aliyun-sls/opentelemetry-go-provider-sls/provider"
 	corelog "log"
 	"net"
 	"net/http"
@@ -12,18 +13,20 @@ import (
 	"time"
 
 	"github.com/go-kit/kit/log"
-	stdopentracing "github.com/opentracing/opentracing-go"
-	zipkinot "github.com/openzipkin-contrib/zipkin-go-opentracing"
-	"github.com/openzipkin/zipkin-go"
-	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 	"github.com/sls-mis/demos/sls-mall/user/api"
 	"github.com/sls-mis/demos/sls-mall/user/db"
 	"github.com/sls-mis/demos/sls-mall/user/db/mongodb"
 )
 
 var (
-	port string
-	zip  string
+	port           string
+	project        string
+	instance       string
+	accessKeyId    string
+	endpoint       string
+	serviceName    string
+	serviceVersion string
+	accessSecret   string
 )
 
 const (
@@ -31,7 +34,13 @@ const (
 )
 
 func init() {
-	flag.StringVar(&zip, "zipkin", os.Getenv("ZIPKIN"), "Zipkin address")
+	flag.StringVar(&project, "project", os.Getenv("PROJECT"), "Zipkin address")
+	flag.StringVar(&instance, "instance", os.Getenv("INSTANCE"), "Zipkin address")
+	flag.StringVar(&accessKeyId, "accessKeyId", os.Getenv("ACCESS_KEY_ID"), "Zipkin address")
+	flag.StringVar(&accessSecret, "accessSecret", os.Getenv("ACCESS_SECRET"), "Zipkin address")
+	flag.StringVar(&endpoint, "endpoint", os.Getenv("ENDPOINT"), "Zipkin address")
+	flag.StringVar(&serviceName, "serviceName", os.Getenv("SERVICE_NAME"), "Zipkin address")
+	flag.StringVar(&serviceVersion, "serviceVersion", os.Getenv("SERVICE_VERSION"), "Zipkin address")
 	flag.StringVar(&port, "port", "8084", "Port on which to run")
 	db.Register("mongodb", &mongodb.Mongo{})
 }
@@ -57,26 +66,17 @@ func main() {
 	}
 	defer conn.Close()
 
-	var tracer stdopentracing.Tracer
-	{
-		if zip == "" {
-			tracer = stdopentracing.NoopTracer{}
-		} else {
-			reporter := zipkinhttp.NewReporter(zip)
-			endpoint, err := zipkin.NewEndpoint(ServiceName, "localhost:8084")
-			if err != nil {
-				logger.Log("unable to create local endpoint: %+v\n", err)
-			}
-
-			nativeTracer, err := zipkin.NewTracer(reporter, zipkin.WithLocalEndpoint(endpoint))
-			if err != nil {
-				logger.Log("unable to create tracer: %+v\n", err)
-			}
-
-			tracer = zipkinot.Wrap(nativeTracer)
-		}
-		stdopentracing.InitGlobalTracer(tracer)
+	slsConfig, err := provider.NewConfig(provider.WithServiceName(serviceName),
+		provider.WithServiceVersion(serviceVersion),
+		provider.WithTraceExporterEndpoint(endpoint),
+		provider.WithSLSConfig(project, instance, accessKeyId, accessSecret))
+	if err != nil {
+		panic(err)
 	}
+	if err := provider.Start(slsConfig); err != nil {
+		panic(err)
+	}
+
 	dbconn := false
 	for !dbconn {
 		err := db.Init()
@@ -96,12 +96,11 @@ func main() {
 		service = api.LoggingMiddleware(logger)(service)
 	}
 
-	endpoints := api.MakeEndpoints(service, tracer)
-	router := api.MakeHTTPHandler(endpoints, logger, tracer)
+	endpoints := api.MakeEndpoints(service)
+	router := api.MakeHTTPHandler(endpoints, logger)
 	srv := &http.Server{
-		Handler: router,
-		Addr:    "0.0.0.0:8084",
-		// Good practice: enforce timeouts for servers you create!
+		Handler:      router,
+		Addr:         "0.0.0.0:8084",
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}

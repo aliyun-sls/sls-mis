@@ -6,12 +6,12 @@ package api
 
 import (
 	"context"
-
 	"github.com/go-kit/kit/endpoint"
-	"github.com/go-kit/kit/tracing/opentracing"
-	stdopentracing "github.com/opentracing/opentracing-go"
 	"github.com/sls-mis/demos/sls-mall/user/db"
+	"github.com/sls-mis/demos/sls-mall/user/opentelemetry"
 	"github.com/sls-mis/demos/sls-mall/user/users"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/label"
 )
 
 // Endpoints collects the endpoints that comprise the Service.
@@ -30,28 +30,27 @@ type Endpoints struct {
 
 // MakeEndpoints returns an Endpoints structure, where each endpoint is
 // backed by the given service.
-func MakeEndpoints(s Service, tracer stdopentracing.Tracer) Endpoints {
+func MakeEndpoints(s Service) Endpoints {
 	return Endpoints{
-		LoginEndpoint:       opentracing.TraceServer(tracer, "GET /login")(MakeLoginEndpoint(s)),
-		RegisterEndpoint:    opentracing.TraceServer(tracer, "POST /register")(MakeRegisterEndpoint(s)),
-		HealthEndpoint:      opentracing.TraceServer(tracer, "GET /health")(MakeHealthEndpoint(s)),
-		UserGetEndpoint:     opentracing.TraceServer(tracer, "GET /customers")(MakeUserGetEndpoint(s)),
-		UserPostEndpoint:    opentracing.TraceServer(tracer, "POST /customers")(MakeUserPostEndpoint(s)),
-		AddressGetEndpoint:  opentracing.TraceServer(tracer, "GET /addresses")(MakeAddressGetEndpoint(s)),
-		AddressPostEndpoint: opentracing.TraceServer(tracer, "POST /addresses")(MakeAddressPostEndpoint(s)),
-		CardGetEndpoint:     opentracing.TraceServer(tracer, "GET /cards")(MakeCardGetEndpoint(s)),
-		DeleteEndpoint:      opentracing.TraceServer(tracer, "DELETE /")(MakeDeleteEndpoint(s)),
-		CardPostEndpoint:    opentracing.TraceServer(tracer, "POST /cards")(MakeCardPostEndpoint(s)),
+		LoginEndpoint:       opentelemetry.TraceServer("GET /login")(MakeLoginEndpoint(s)),
+		RegisterEndpoint:    opentelemetry.TraceServer("POST /register")(MakeRegisterEndpoint(s)),
+		HealthEndpoint:      opentelemetry.TraceServer("GET /health")(MakeHealthEndpoint(s)),
+		UserGetEndpoint:     opentelemetry.TraceServer("GET /customers")(MakeUserGetEndpoint(s)),
+		UserPostEndpoint:    opentelemetry.TraceServer("POST /customers")(MakeUserPostEndpoint(s)),
+		AddressGetEndpoint:  opentelemetry.TraceServer("GET /addresses")(MakeAddressGetEndpoint(s)),
+		AddressPostEndpoint: opentelemetry.TraceServer("POST /addresses")(MakeAddressPostEndpoint(s)),
+		CardGetEndpoint:     opentelemetry.TraceServer("GET /cards")(MakeCardGetEndpoint(s)),
+		DeleteEndpoint:      opentelemetry.TraceServer("DELETE /")(MakeDeleteEndpoint(s)),
+		CardPostEndpoint:    opentelemetry.TraceServer("POST /cards")(MakeCardPostEndpoint(s)),
 	}
 }
 
 // MakeLoginEndpoint returns an endpoint via the given service.
 func MakeLoginEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		var span stdopentracing.Span
-		span, ctx = stdopentracing.StartSpanFromContext(ctx, "login user")
-		span.SetTag("service", "user")
-		defer span.Finish()
+		ctx, span := otel.Tracer("").Start(ctx, "login user")
+		span.SetAttributes(label.String("service", "user"))
+		defer span.End()
 		req := request.(loginRequest)
 		u, err := s.Login(req.Username, req.Password)
 		return userResponse{User: u}, err
@@ -61,10 +60,9 @@ func MakeLoginEndpoint(s Service) endpoint.Endpoint {
 // MakeRegisterEndpoint returns an endpoint via the given service.
 func MakeRegisterEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		var span stdopentracing.Span
-		span, ctx = stdopentracing.StartSpanFromContext(ctx, "register user")
-		span.SetTag("service", "user")
-		defer span.Finish()
+		ctx, span := otel.Tracer("").Start(ctx, "register user")
+		span.SetAttributes(label.String("service", "user"))
+		defer span.End()
 		req := request.(registerRequest)
 		id, err := s.Register(req.Username, req.Password, req.Email, req.FirstName, req.LastName)
 		return postResponse{ID: id}, err
@@ -74,16 +72,14 @@ func MakeRegisterEndpoint(s Service) endpoint.Endpoint {
 // MakeUserGetEndpoint returns an endpoint via the given service.
 func MakeUserGetEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		var span stdopentracing.Span
-		span, ctx = stdopentracing.StartSpanFromContext(ctx, "get users")
-		span.SetTag("service", "user")
-		defer span.Finish()
-
+		newCtx, span := otel.Tracer("").Start(ctx, "get users")
+		span.SetAttributes(label.String("service", "user"))
+		defer span.End()
 		req := request.(GetRequest)
 
-		userspan := stdopentracing.StartSpan("users from db", stdopentracing.ChildOf(span.Context()))
+		_, mongoSpan := otel.Tracer("").Start(newCtx, "users from db")
 		usrs, err := s.GetUsers(req.ID)
-		userspan.Finish()
+		mongoSpan.End()
 		if req.ID == "" {
 			return EmbedStruct{usersResponse{Users: usrs}}, err
 		}
@@ -97,9 +93,9 @@ func MakeUserGetEndpoint(s Service) endpoint.Endpoint {
 			return users.User{}, err
 		}
 		user := usrs[0]
-		attrspan := stdopentracing.StartSpan("attributes from db", stdopentracing.ChildOf(span.Context()))
+		_, attributeSpan := otel.Tracer("").Start(newCtx, "attributes from db")
 		db.GetUserAttributes(&user)
-		attrspan.Finish()
+		attributeSpan.End()
 		if req.Attr == "addresses" {
 			return EmbedStruct{addressesResponse{Addresses: user.Addresses}}, err
 		}
@@ -113,10 +109,9 @@ func MakeUserGetEndpoint(s Service) endpoint.Endpoint {
 // MakeUserPostEndpoint returns an endpoint via the given service.
 func MakeUserPostEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		var span stdopentracing.Span
-		span, ctx = stdopentracing.StartSpanFromContext(ctx, "post user")
-		span.SetTag("service", "user")
-		defer span.Finish()
+		_, span := otel.Tracer("").Start(ctx, "post users")
+		span.SetAttributes(label.String("service", "user"))
+		defer span.End()
 		req := request.(users.User)
 		id, err := s.PostUser(req)
 		return postResponse{ID: id}, err
@@ -126,14 +121,13 @@ func MakeUserPostEndpoint(s Service) endpoint.Endpoint {
 // MakeAddressGetEndpoint returns an endpoint via the given service.
 func MakeAddressGetEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		var span stdopentracing.Span
-		span, ctx = stdopentracing.StartSpanFromContext(ctx, "get users")
-		span.SetTag("service", "user")
-		defer span.Finish()
+		newCtx, getSpan := otel.Tracer("").Start(ctx, "get users")
+		getSpan.SetAttributes(label.String("service", "user"))
+		defer getSpan.End()
 		req := request.(GetRequest)
-		addrspan := stdopentracing.StartSpan("addresses from db", stdopentracing.ChildOf(span.Context()))
+		_, attributeSpan := otel.Tracer("").Start(newCtx, "addresses from db")
 		adds, err := s.GetAddresses(req.ID)
-		addrspan.Finish()
+		attributeSpan.End()
 		if req.ID == "" {
 			return EmbedStruct{addressesResponse{Addresses: adds}}, err
 		}
@@ -147,10 +141,9 @@ func MakeAddressGetEndpoint(s Service) endpoint.Endpoint {
 // MakeAddressPostEndpoint returns an endpoint via the given service.
 func MakeAddressPostEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		var span stdopentracing.Span
-		span, ctx = stdopentracing.StartSpanFromContext(ctx, "post address")
-		span.SetTag("service", "user")
-		defer span.Finish()
+		_, postSpan := otel.Tracer("").Start(ctx, "post address")
+		postSpan.SetAttributes(label.String("service", "user"))
+		defer postSpan.End()
 		req := request.(addressPostRequest)
 		id, err := s.PostAddress(req.Address, req.UserID)
 		return postResponse{ID: id}, err
@@ -160,14 +153,15 @@ func MakeAddressPostEndpoint(s Service) endpoint.Endpoint {
 // MakeUserGetEndpoint returns an endpoint via the given service.
 func MakeCardGetEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		var span stdopentracing.Span
-		span, ctx = stdopentracing.StartSpanFromContext(ctx, "get cards")
-		span.SetTag("service", "user")
-		defer span.Finish()
+		newCtx, getSpan := otel.Tracer("").Start(ctx, "get cards")
+		getSpan.SetAttributes(label.String("service", "user"))
+		defer getSpan.End()
 		req := request.(GetRequest)
-		cardspan := stdopentracing.StartSpan("addresses from db", stdopentracing.ChildOf(span.Context()))
+
+		_, span := otel.Tracer("").Start(newCtx, "addresses from db")
+		span.SetAttributes(label.String("service", "user"))
 		cards, err := s.GetCards(req.ID)
-		cardspan.Finish()
+		span.End()
 		if req.ID == "" {
 			return EmbedStruct{cardsResponse{Cards: cards}}, err
 		}
@@ -181,10 +175,9 @@ func MakeCardGetEndpoint(s Service) endpoint.Endpoint {
 // MakeCardPostEndpoint returns an endpoint via the given service.
 func MakeCardPostEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		var span stdopentracing.Span
-		span, ctx = stdopentracing.StartSpanFromContext(ctx, "post card")
-		span.SetTag("service", "user")
-		defer span.Finish()
+		_, span := otel.Tracer("").Start(ctx, "post card")
+		span.SetAttributes(label.String("service", "user"))
+		defer span.End()
 		req := request.(cardPostRequest)
 		id, err := s.PostCard(req.Card, req.UserID)
 		return postResponse{ID: id}, err
@@ -194,10 +187,9 @@ func MakeCardPostEndpoint(s Service) endpoint.Endpoint {
 // MakeLoginEndpoint returns an endpoint via the given service.
 func MakeDeleteEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		var span stdopentracing.Span
-		span, ctx = stdopentracing.StartSpanFromContext(ctx, "delete entity")
-		span.SetTag("service", "user")
-		defer span.Finish()
+		_, span := otel.Tracer("").Start(ctx, "delete entity")
+		span.SetAttributes(label.String("service", "user"))
+		defer span.End()
 		req := request.(deleteRequest)
 		err = s.Delete(req.Entity, req.ID)
 		if err == nil {
@@ -210,10 +202,9 @@ func MakeDeleteEndpoint(s Service) endpoint.Endpoint {
 // MakeHealthEndpoint returns current health of the given service.
 func MakeHealthEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		var span stdopentracing.Span
-		span, ctx = stdopentracing.StartSpanFromContext(ctx, "health check")
-		span.SetTag("service", "user")
-		defer span.Finish()
+		_, span := otel.Tracer("").Start(ctx, "health check")
+		span.SetAttributes(label.String("service", "user"))
+		defer span.End()
 		health := s.Health()
 		return healthResponse{Health: health}, nil
 	}
