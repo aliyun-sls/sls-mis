@@ -21,7 +21,6 @@ import works.weave.socks.orders.values.PaymentResponse;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -53,12 +52,9 @@ public class OrdersController {
     @ResponseBody
     CustomerOrder newOrder(@RequestBody NewOrderResource item) {
         try {
-
             if (item.address == null || item.customer == null || item.card == null || item.items == null) {
                 throw new InvalidOrderException("Invalid order request. Order requires customer, address, card and items.");
             }
-
-
             LOG.debug("Starting calls");
             Future<Resource<Address>> addressFuture = asyncGetService.getResource(item.address, new TypeReferences
                     .ResourceType<Address>() {
@@ -73,9 +69,7 @@ public class OrdersController {
                     ParameterizedTypeReference<List<Item>>() {
             });
             LOG.debug("End of calls.");
-
             float amount = calculateTotal(itemsFuture.get(timeout, TimeUnit.SECONDS));
-
             // Call payment service to make sure they've paid
             PaymentRequest paymentRequest = new PaymentRequest(
                     addressFuture.get(timeout, TimeUnit.SECONDS).getContent(),
@@ -120,21 +114,21 @@ public class OrdersController {
             CustomerOrder savedOrder = customerOrderRepository.save(order);
             LOG.info("Saved order: " + savedOrder);
 
-            Date date = new Date();
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(date);//设置起时间//System.out.println("111111111::::"+cal.getTime());
-            cal.add(Calendar.YEAR, 1);
-            IntegralRecord integralRecord = new IntegralRecord();
-            integralRecord.setOriginalId(savedOrder.getId());
-            integralRecord.setReason("购物");
-            integralRecord.setType(0);
-            integralRecord.setValue(amount);
-            integralRecord.setUserId(customerId);
-            integralRecord.setExpireTime(cal.getTime());
-            Future<String> stringFuture = asyncGetService.postResource(config.getAntiCheatingUri(), integralRecord,
-                    new ParameterizedTypeReference<String>() {
-                    });
-            LOG.info("integral :{} " + stringFuture.get());
+//            Date date = new Date();
+//            Calendar cal = Calendar.getInstance();
+//            cal.setTime(date);//设置起时间//System.out.println("111111111::::"+cal.getTime());
+//            cal.add(Calendar.YEAR, 1);
+//            IntegralRecord integralRecord = new IntegralRecord();
+//            integralRecord.setOriginalId(savedOrder.getId());
+//            integralRecord.setReason("购物");
+//            integralRecord.setType(0);
+//            integralRecord.setValue(amount);
+//            integralRecord.setUserId(customerId);
+//            integralRecord.setExpireTime(cal.getTime());
+//            Future<String> stringFuture = asyncGetService.postResource(config.getAntiCheatingUri(), integralRecord,
+//                    new ParameterizedTypeReference<String>() {
+//                    });
+//            LOG.info("integral :{} " + stringFuture.get());
 
             return savedOrder;
         } catch (TimeoutException e) {

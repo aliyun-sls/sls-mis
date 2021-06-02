@@ -1,6 +1,8 @@
 package works.weave.socks.shipping.controllers;
 
 import com.rabbitmq.client.Channel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.ChannelCallback;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -20,6 +22,8 @@ import java.util.Map;
 @RestController
 public class ShippingController {
 
+    private static Logger logger = LoggerFactory.getLogger(ShippingController.class);
+
     @Autowired
     RabbitTemplate rabbitTemplate;
 
@@ -38,11 +42,11 @@ public class ShippingController {
     public
     @ResponseBody
     Shipment postShipping(@RequestBody Shipment shipment) {
-        System.out.println("Adding shipment to queue...");
+        logger.info("add Shipment[{}, {}] to queue", shipment.getId(), shipment.getName());
         try {
             rabbitTemplate.convertAndSend("shipping-task", shipment);
         } catch (Exception e) {
-            System.out.println("Unable to add to queue (the queue is probably down). Accepting anyway. Don't do this " +
+            logger.error("Unable to add to queue (the queue is probably down). Accepting anyway. Don't do this " +
                     "for real!");
         }
         return shipment;
@@ -68,7 +72,7 @@ public class ShippingController {
                     return serverProperties.get("version").toString();
                 }
             });
-        } catch ( AmqpException e ) {
+        } catch (AmqpException e) {
             rabbitmq.setStatus("err");
         }
 
