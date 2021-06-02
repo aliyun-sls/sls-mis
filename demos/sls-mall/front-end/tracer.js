@@ -12,13 +12,17 @@ const {HttpInstrumentation} = require('@opentelemetry/instrumentation-http');
 
 module.exports = (parameter) => {
     const provider = new NodeTracerProvider();
+    provider.register();
+
     registerInstrumentations({
-        tracerProvider: provider,
         instrumentations: [
-            HttpInstrumentation,
-            ExpressInstrumentation,
+            new HttpInstrumentation(),
+            new ExpressInstrumentation({
+                ignoreLayersType: ['middleware']
+            }),
         ],
-    });
+        tracerProvider: provider,
+    })
     var meta = new grpc.Metadata();
     meta.add('x-sls-otel-project', parameter.project);
     meta.add('x-sls-otel-instance-id', parameter.instance);
