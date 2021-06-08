@@ -8,9 +8,9 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource
     driver: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://integral-db:3306/integral?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
-    username: integral
-    password: default_password
+    url: jdbc:mysql://${DATABASE_HOST:integral-db}:3306/${DATABASE_NAME:integral}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
   sleuth:
     sampler:
       percentage: 1.0

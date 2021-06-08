@@ -19,12 +19,10 @@
         </encoder>
     </appender>
 
-    <logger name="org.springframework" level="info"/>
-    <logger name="org.springframework.amqp.rabbit" level="debug"/>
+<!--    <logger name="org.springframework" level="off"/>-->
 
     <root level="info">
         <appender-ref ref="Console"/>
         <appender-ref ref="ROLLING"/>
-
     </root>
 </configuration>

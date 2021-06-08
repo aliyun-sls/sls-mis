@@ -7,6 +7,7 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
+	"github.com/go-kit/kit/log"
 	"io"
 	"time"
 
@@ -29,7 +30,7 @@ type Service interface {
 	GetCards(id string) ([]users.Card, error)
 	PostCard(u users.Card, userid string) (string, error)
 	Delete(entity, id string) error
-	Health() []Health // GET /health
+	Health(logger log.Logger) []Health // GET /health
 }
 
 // NewFixedService returns a simple implementation of the Service interface,
@@ -133,7 +134,7 @@ func (s *fixedService) Delete(entity, id string) error {
 	return db.Delete(entity, id)
 }
 
-func (s *fixedService) Health() []Health {
+func (s *fixedService) Health(logger log.Logger) []Health {
 	var health []Health
 	dbstatus := "OK"
 
@@ -141,7 +142,7 @@ func (s *fixedService) Health() []Health {
 	if err != nil {
 		dbstatus = "err"
 	}
-
+	logger.Log("HHH");
 	app := Health{"user", "OK", time.Now().String()}
 	db := Health{"user-db", dbstatus, time.Now().String()}
 

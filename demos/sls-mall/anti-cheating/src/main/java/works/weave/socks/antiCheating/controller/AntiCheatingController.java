@@ -17,6 +17,7 @@ import works.weave.socks.antiCheating.entities.IntegralRecord;
 import works.weave.socks.antiCheating.service.AsyncGetService;
 
 import java.net.URI;
+import java.util.List;
 import java.util.concurrent.Future;
 
 
@@ -57,5 +58,12 @@ public class AntiCheatingController {
             return Boolean.FALSE;
         }
         return Boolean.TRUE;
+    }
+
+
+    @RequestMapping(value = "/listIntegral", method = RequestMethod.GET)
+    @ResponseBody
+    public List<AntiCheatingRecord> antiCheatingRecordList() {
+        return antiCheatingRecordDao.findObjects();
     }
 }

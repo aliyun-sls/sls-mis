@@ -96,7 +96,7 @@ func main() {
 		service = api.LoggingMiddleware(logger)(service)
 	}
 
-	endpoints := api.MakeEndpoints(service)
+	endpoints := api.MakeEndpoints(service, logger)
 	router := api.MakeHTTPHandler(endpoints, logger)
 	srv := &http.Server{
 		Handler:      router,

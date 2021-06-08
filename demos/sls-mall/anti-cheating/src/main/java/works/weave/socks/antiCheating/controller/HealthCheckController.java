@@ -21,12 +21,6 @@ public class HealthCheckController {
         HealthCheck app = new HealthCheck("ant-cheating", "OK", dateNow);
         HealthCheck database = new HealthCheck("integral-db", "OK", dateNow);
 
-        /*try {
-            mongoTemplate.executeCommand("{ buildInfo: 1 }");
-        } catch (Exception e) {
-            database.setStatus("err");
-        }*/
-
         healthChecks.add(app);
         healthChecks.add(database);
 

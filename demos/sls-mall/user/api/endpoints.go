@@ -7,6 +7,7 @@ package api
 import (
 	"context"
 	"github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/kit/log"
 	"github.com/sls-mis/demos/sls-mall/user/db"
 	"github.com/sls-mis/demos/sls-mall/user/opentelemetry"
 	"github.com/sls-mis/demos/sls-mall/user/users"
@@ -30,11 +31,11 @@ type Endpoints struct {
 
 // MakeEndpoints returns an Endpoints structure, where each endpoint is
 // backed by the given service.
-func MakeEndpoints(s Service) Endpoints {
+func MakeEndpoints(s Service, logger log.Logger) Endpoints {
 	return Endpoints{
 		LoginEndpoint:       opentelemetry.TraceServer("GET /login")(MakeLoginEndpoint(s)),
 		RegisterEndpoint:    opentelemetry.TraceServer("POST /register")(MakeRegisterEndpoint(s)),
-		HealthEndpoint:      opentelemetry.TraceServer("GET /health")(MakeHealthEndpoint(s)),
+		HealthEndpoint:      opentelemetry.TraceServer("GET /health")(MakeHealthEndpoint(s, logger)),
 		UserGetEndpoint:     opentelemetry.TraceServer("GET /customers")(MakeUserGetEndpoint(s)),
 		UserPostEndpoint:    opentelemetry.TraceServer("POST /customers")(MakeUserPostEndpoint(s)),
 		AddressGetEndpoint:  opentelemetry.TraceServer("GET /addresses")(MakeAddressGetEndpoint(s)),
@@ -200,12 +201,22 @@ func MakeDeleteEndpoint(s Service) endpoint.Endpoint {
 }
 
 // MakeHealthEndpoint returns current health of the given service.
-func MakeHealthEndpoint(s Service) endpoint.Endpoint {
+func MakeHealthEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		_, span := otel.Tracer("").Start(ctx, "health check")
 		span.SetAttributes(label.String("service", "user"))
 		defer span.End()
-		health := s.Health()
+		newLogger := log.With(logger, "traceId", func() log.Valuer {
+			return func() interface{} {
+				return span.SpanContext().TraceID
+			}
+		}())
+
+		health := s.Health(log.With(newLogger, "spanId", func() log.Valuer {
+			return func() interface{} {
+				return span.SpanContext().SpanID
+			}
+		}()))
 		return healthResponse{Health: health}, nil
 	}
 }

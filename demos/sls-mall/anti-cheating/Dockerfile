@@ -6,7 +6,11 @@ ENV PROJECT="" \
     ENDPOINT="" \
     SERVICE_NAME="anti-cheating" \
     SERVICE_VERSION="1.0.0" \
-    SERVICE_HOST="127.0.0.1"
+    SERVICE_HOST="127.0.0.1" \
+    DATABASE_HOST="integral-db" \
+    DATABASE_NAME="integral" \
+    DATABASE_USER="root" \
+    DATABASE_PASSWORD=""
 
 WORKDIR /sls-mall
 COPY target/anti-cheating.jar ./app.jar

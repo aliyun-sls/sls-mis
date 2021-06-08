@@ -23,4 +23,7 @@
         value (#{type},#{originalId},#{reason},#{userId},now(),now())
     </insert>
 
+    <select id="findObjects" resultOrdered="true" resultMap="AntiCheatingRecord">
+        SELECT * FROM anti_cheating_record order by update_time desc
+    </select>
 </mapper>
