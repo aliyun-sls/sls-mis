@@ -8,7 +8,7 @@
 ./mvnw clean package
 ```
 
-2. 运行
+2. 运行工程
 ```shell
 export ACCESS_KEY_ID=<YOUR_ACCESS_KEY_ID>
 export ACCESS_SECRET=<YOUR_ACCESS_SECRET>
@@ -26,3 +26,12 @@ java -DACCESS_KEY_ID=${ACCESS_KEY_ID} -DACCESS_SECRET=${ACCESS_SECRET} -DPROJECT
 |PROJECT_NAME|日志服务Project名称。 |
 |INSTANCE|Trace服务实例名称。 |
 |ENDPOINT|接入地址，格式为https://${project}.${region-endpoint}/zipkin，其中：<br/> ${project}：日志服务Project名称。<br/>${region-endpoint}：Project访问域名，支持公网和阿里云内网（经典网络、VPC）。 |
+
+
+3. 访问服务
+
+``` shell
+curl http://localhost:8080/hello-world
+```
+
+4. 查看Trace
