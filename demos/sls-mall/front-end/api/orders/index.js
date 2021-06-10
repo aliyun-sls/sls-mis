@@ -7,6 +7,7 @@
     , endpoints = require("../endpoints")
     , helpers   = require("../../helpers")
     , app       = express()
+  const {context, getSpan} = require('@opentelemetry/api');
 
   app.get("/orders", function (req, res, next) {
     console.log("Request received with body: " + JSON.stringify(req.body));
@@ -17,6 +18,7 @@
     }
 
     var custId = req.session.customerId;
+    var span = getSpan(context.active());
     async.waterfall([
         function (callback) {
           request(endpoints.ordersUrl + "/orders/search/customerId?sort=date&custId=" + custId, function (error, response, body) {
@@ -36,7 +38,11 @@
       if (err) {
         return next(err);
       }
-      helpers.respondStatusBody(res, 201, JSON.stringify(result));
+      helpers.respondStatusBody(res, 201, JSON.stringify(result), function (span){
+        if (span) {
+          return {'trace-id': span.context().traceId}
+        }
+      }(span));
     });
   });
 
@@ -54,7 +60,7 @@
     }
 
     var custId = req.session.customerId;
-
+    var span = getSpan(context.active());
     async.waterfall([
         function (callback) {
           request(endpoints.customersUrl + "/" + custId, function (error, response, body) {
@@ -139,7 +145,11 @@
       if (err) {
         return next(err);
       }
-      helpers.respondStatusBody(res, status, JSON.stringify(result));
+      helpers.respondStatusBody(res, status, JSON.stringify(result), function (span){
+        if (span) {
+          return {'trace-id': span.context().traceId}
+        }
+      }(span));
     });
   });
 

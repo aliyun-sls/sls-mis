@@ -7,17 +7,23 @@
     , helpers   = require("../../helpers")
     , endpoints = require("../endpoints")
     , app       = express()
+    const {context, getSpan} = require('@opentelemetry/api');
 
   // List items in cart for current logged in user.
   app.get("/cart", function (req, res, next) {
     console.log("Request received: " + req.url + ", " + req.query.custId);
     var custId = helpers.getCustomerId(req, app.get("env"));
     console.log("Customer ID: " + custId);
+    var span = getSpan(context.active());
     request(endpoints.cartsUrl + "/" + custId + "/items", function (error, response, body) {
       if (error) {
         return next(error);
       }
-      helpers.respondStatusBody(res, response.statusCode, body)
+      if (span){
+          helpers.respondStatusBody(res, response.statusCode, body, {'trace-id': span.context().traceId})
+      } else {
+          helpers.respondStatusBody(res, response.statusCode, body)
+      }
     });
   });
 
@@ -29,12 +35,17 @@
       uri: endpoints.cartsUrl + "/" + custId,
       method: 'DELETE'
     };
+    var span = getSpan(context.active());
     request(options, function (error, response, body) {
       if (error) {
         return next(error);
       }
       console.log('User cart deleted with status: ' + response.statusCode);
-      helpers.respondStatus(res, response.statusCode);
+      if (span) {
+          helpers.respondStatus(res, response.statusCode, {'trace-id': span.context().traceId});
+      } else {
+          helpers.respondStatus(res, response.statusCode)
+      }
     });
   });
 
@@ -52,12 +63,22 @@
       uri: endpoints.cartsUrl + "/" + custId + "/items/" + req.params.id.toString(),
       method: 'DELETE'
     };
+
+    var span = getSpan(context.active());
     request(options, function (error, response, body) {
       if (error) {
-        return next(error);
+        if (span) {
+          helpers.respondStatus(res, response.statusCode, {'trace-id': span.context().traceId});
+        } else {
+          helpers.respondStatus(res, response.statusCode)
+        }
       }
       console.log('Item deleted with status: ' + response.statusCode);
-      helpers.respondStatus(res, response.statusCode);
+      if (span) {
+          helpers.respondStatus(res, response.statusCode, {'trace-id': span.context().traceId});
+      } else {
+          helpers.respondStatus(res, response.statusCode)
+      }
     });
   });
 
@@ -71,7 +92,7 @@
     }
 
     var custId = helpers.getCustomerId(req, app.get("env"));
-
+    var span = getSpan(context.active());
     async.waterfall([
         function (callback) {
           request(endpoints.catalogueUrl + "/catalogue/" + req.body.id.toString(), function (error, response, body) {
@@ -102,7 +123,11 @@
       if (statusCode != 201) {
         return next(new Error("Unable to add to cart. Status code: " + statusCode))
       }
-      helpers.respondStatus(res, statusCode);
+      if (span) {
+          helpers.respondStatus(res, statusCode, {'trace-id': span.context().traceId});
+      } else {
+          helpers.respondStatus(res, statusCode)
+      }
     });
   });
 
@@ -119,7 +144,7 @@
       return;
     }
     var custId = helpers.getCustomerId(req, app.get("env"));
-
+    var span = getSpan(context.active());
     async.waterfall([
         function (callback) {
           request(endpoints.catalogueUrl + "/catalogue/" + req.body.id.toString(), function (error, response, body) {
@@ -150,7 +175,12 @@
       if (statusCode != 202) {
         return next(new Error("Unable to add to cart. Status code: " + statusCode))
       }
-      helpers.respondStatus(res, statusCode);
+
+      if (span) {
+          helpers.respondStatus(res, statusCode, {'trace-id': span.context().traceId});
+      } else {
+          helpers.respondStatus(res, statusCode)
+      }
     });
   });
   

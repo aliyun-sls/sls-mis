@@ -1,5 +1,6 @@
 (function() {
     'use strict';
+    const {context, getSpan} = require('@opentelemetry/api');
 
     var async = require("async"), express = require("express"), request = require("request"), endpoints = require("../endpoints"), helpers = require("../../helpers"), app = express(), cookie_name = "logged_in"
 
@@ -31,12 +32,16 @@
         };
 
         console.log("Posting Customer: " + JSON.stringify(req.body));
-
+        var span = getSpan(context.active());
         request(options, function(error, response, body) {
             if (error) {
                 return next(error);
             }
-            helpers.respondSuccessBody(res, JSON.stringify(body));
+            helpers.respondSuccessBody(res, JSON.stringify(body), function (span){
+                if (span) {
+                    return {'trace-id': span.context().traceId}
+                }
+            }(span));
         }.bind({
             res: res
         }));
@@ -52,11 +57,16 @@
             body: req.body
         };
         console.log("Posting Address: " + JSON.stringify(req.body));
+        var span = getSpan(context.active());
         request(options, function(error, response, body) {
             if (error) {
                 return next(error);
             }
-            helpers.respondSuccessBody(res, JSON.stringify(body));
+            helpers.respondSuccessBody(res, JSON.stringify(body), function (span){
+                if (span) {
+                    return {'trace-id': span.context().traceId}
+                }
+            }(span));
         }.bind({
             res: res
         }));
@@ -68,6 +78,7 @@
             uri: endpoints.customersUrl + '/' + custId + '/cards',
             method: 'GET',
         };
+        var span = getSpan(context.active());
         request(options, function(error, response, body) {
             if (error) {
                 return next(error);
@@ -77,9 +88,18 @@
                 var resp = {
                     "number": data._embedded.card[0].longNum.slice(-4)
                 };
-                return helpers.respondSuccessBody(res, JSON.stringify(resp));
+                return helpers.respondSuccessBody(res, JSON.stringify(body), function (span){
+                    if (span) {
+                        return {'trace-id': span.context().traceId}
+                    }
+                }(span));
             }
-            return helpers.respondSuccessBody(res, JSON.stringify({"status_code": 500}));
+
+            return helpers.respondSuccessBody(res, JSON.stringify({"status_code": 500}), function (span){
+                if (span) {
+                    return {'trace-id': span.context().traceId}
+                }
+            }(span));
         }.bind({
             res: res
         }));
@@ -91,6 +111,7 @@
             uri: endpoints.customersUrl + '/' + custId + '/addresses',
             method: 'GET',
         };
+        var span = getSpan(context.active());
         request(options, function(error, response, body) {
             if (error) {
                 return next(error);
@@ -98,9 +119,18 @@
             var data = JSON.parse(body);
             if (data.status_code !== 500 && data._embedded.address.length !== 0 ) {
                 var resp = data._embedded.address[0];
-                return helpers.respondSuccessBody(res, JSON.stringify(resp));
+                return helpers.respondSuccessBody(res, JSON.stringify(resp), function (span){
+                    if (span) {
+                        return {'trace-id': span.context().traceId}
+                    }
+                }(span));
             }
-            return helpers.respondSuccessBody(res, JSON.stringify({"status_code": 500}));
+
+            return helpers.respondSuccessBody(res, JSON.stringify({"status_code": 500}), function (span){
+                if (span) {
+                    return {'trace-id': span.context().traceId}
+                }
+            }(span));
         }.bind({
             res: res
         }));
@@ -116,11 +146,16 @@
             body: req.body
         };
         console.log("Posting Card: " + JSON.stringify(req.body));
+        var span = getSpan(context.active());
         request(options, function(error, response, body) {
             if (error) {
                 return next(error);
             }
-            helpers.respondSuccessBody(res, JSON.stringify(body));
+            helpers.respondSuccessBody(res, JSON.stringify(body), function (span){
+                if (span) {
+                    return {'trace-id': span.context().traceId}
+                }
+            }(span));
         }.bind({
             res: res
         }));
@@ -133,11 +168,16 @@
             uri: endpoints.customersUrl + "/" + req.params.id,
             method: 'DELETE'
         };
+        var span = getSpan(context.active());
         request(options, function(error, response, body) {
             if (error) {
                 return next(error);
             }
-            helpers.respondSuccessBody(res, JSON.stringify(body));
+            helpers.respondSuccessBody(res, JSON.stringify(body), function (span){
+                if (span) {
+                    return {'trace-id': span.context().traceId}
+                }
+            }(span));
         }.bind({
             res: res
         }));
@@ -150,11 +190,16 @@
             uri: endpoints.addressUrl + "/" + req.params.id,
             method: 'DELETE'
         };
+        var span = getSpan(context.active());
         request(options, function(error, response, body) {
             if (error) {
                 return next(error);
             }
-            helpers.respondSuccessBody(res, JSON.stringify(body));
+            helpers.respondSuccessBody(res, JSON.stringify(body), function (span){
+                if (span) {
+                    return {'trace-id': span.context().traceId}
+                }
+            }(span));
         }.bind({
             res: res
         }));
@@ -167,11 +212,16 @@
             uri: endpoints.cardsUrl + "/" + req.params.id,
             method: 'DELETE'
         };
+        var span = getSpan(context.active());
         request(options, function(error, response, body) {
             if (error) {
                 return next(error);
             }
-            helpers.respondSuccessBody(res, JSON.stringify(body));
+            helpers.respondSuccessBody(res, JSON.stringify(body), function (span){
+                if (span) {
+                    return {'trace-id': span.context().traceId}
+                }
+            }(span));
         }.bind({
             res: res
         }));
@@ -186,7 +236,7 @@
         };
 
         console.log("Posting Customer: " + JSON.stringify(req.body));
-
+        var span = getSpan(context.active());
         async.waterfall([
                 function(callback) {
                     request(options, function(error, response, body) {
@@ -237,6 +287,9 @@
                 }
                 console.log("set cookie" + custId);
                 res.status(200);
+                if (span) {
+                    res.header('trace-id', span.context().traceId)
+                }
                 res.cookie(cookie_name, req.session.id, {
                     maxAge: 3600000
                 }).send({id: custId});
@@ -249,7 +302,7 @@
 
     app.get("/login", function(req, res, next) {
         console.log("Received login request");
-
+        var span = getSpan(context.active());
         async.waterfall([
                 function(callback) {
                     var options = {
@@ -300,6 +353,9 @@
                     res.status(401);
                     res.end();
                     return;
+                }
+                if (span) {
+                    res.header('trace-id', span.context().traceId)
                 }
                 res.status(200);
                 res.cookie(cookie_name, req.session.id, {

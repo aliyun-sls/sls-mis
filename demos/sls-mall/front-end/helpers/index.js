@@ -3,6 +3,7 @@
 
   var request = require("request");
   var helpers = {};
+  const {context, getSpan} = require('@opentelemetry/api');
 
   /* Public: errorHandler is a middleware that handles your errors
    *
@@ -29,8 +30,8 @@
   };
 
   /* Responds with the given body and status 200 OK  */
-  helpers.respondSuccessBody = function(res, body) {
-    helpers.respondStatusBody(res, 200, body);
+  helpers.respondSuccessBody = function(res, body, headers) {
+    helpers.respondStatusBody(res, 200, body, headers);
   }
 
   /* Public: responds with the given body and status
@@ -39,15 +40,23 @@
    * statusCode - the HTTP status code to set to the response
    * body       - (string) the body to yield to the response
    */
-  helpers.respondStatusBody = function(res, statusCode, body) {
-    res.writeHeader(statusCode);
+  helpers.respondStatusBody = function(res, statusCode, body, headers) {
+    if (headers) {
+      res.writeHeader(statusCode, headers);
+    } else {
+      res.writeHeader(statusCode);
+    }
     res.write(body);
     res.end();
   }
 
   /* Responds with the given statusCode */
-  helpers.respondStatus = function(res, statusCode) {
-    res.writeHeader(statusCode);
+  helpers.respondStatus = function(res, statusCode, headers) {
+    if (headers) {
+      res.writeHeader(statusCode, headers);
+    } else {
+      res.writeHeader(statusCode);
+    }
     res.end();
   }
 
@@ -76,9 +85,14 @@
    * });
    */
   helpers.simpleHttpRequest = function(url, res, next) {
+    var span = getSpan(context.active());
     request.get(url, function(error, response, body) {
       if (error) return next(error);
-      helpers.respondSuccessBody(res, body);
+      if (span) {
+        helpers.respondSuccessBody(res, body, {'trace-id': span.context().traceId});
+      } else {
+        helpers.respondSuccessBody(res, body);
+      }
     }.bind({res: res}));
   }
 
