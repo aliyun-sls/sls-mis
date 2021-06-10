@@ -16,10 +16,12 @@ app.get("/hello-world", (req, res, next) => {
 });
 
 app.get("/save-order", async (req, res, next) => {
-    const currentSpan = getSpan(context.active());
-
     const orderId = req.query.id;
+
+    const currentSpan = getSpan(context.active());
     res.set("trace-id", currentSpan.context().traceId);
+
+    currentSpan.setAttribute("orderInfo", "other information");
 
     try {
         if (orderId == null) {
@@ -31,7 +33,7 @@ app.get("/save-order", async (req, res, next) => {
                 orderID: orderId
             }
         }, context.active());
-        childSpan.setAttribute("orderInfo", "other information");
+        await sleep(2000)
         childSpan.end()
 
         res.send("Saved")
