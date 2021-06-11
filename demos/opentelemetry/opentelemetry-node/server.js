@@ -1,7 +1,7 @@
 "use strict";
 require("./init-trace")(require("./utils")());
 const app = require("express")();
-const {context, getSpan, trace} = require("@opentelemetry/api");
+const {context, getSpan, trace, SpanStatusCode} = require("@opentelemetry/api");
 
 async function sleep(num) {
     return new Promise((resolve) => {
@@ -34,6 +34,10 @@ app.get("/save-order", async (req, res, next) => {
             }
         }, context.active());
         await sleep(2000)
+        childSpan.setStatus({
+            code: SpanStatusCode.ERROR,
+            message: "Failed to save to DB"
+        })
         childSpan.end()
 
         res.send("Saved")
