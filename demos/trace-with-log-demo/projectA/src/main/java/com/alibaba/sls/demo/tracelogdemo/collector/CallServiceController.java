@@ -1,5 +1,6 @@
 package com.alibaba.sls.demo.tracelogdemo.collector;
 
+import com.alibaba.sls.demo.tracelogdemo.exception.BusinessException;
 import com.alibaba.sls.demo.tracelogdemo.protocol.Request;
 import com.alibaba.sls.demo.tracelogdemo.service.ProjectBServices;
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ public class CallServiceController {
         logger.info("创建订单：用户ID:{}, 商品信息：{}", id, name);
         Request request = projectBServices.createOrder(id, name);
         if (!request.isSuccess()) {
-            return Request.ofFailure(request.getMessage());
+            throw new BusinessException("创建订单失败:" + request.getMessage());
         }
         return Request.ofSuccess("创建订单成功");
     }
