@@ -1,6 +1,6 @@
 package com.alibaba.sls.demo.apachedubbo.inter;
 
-public interface GreetService {
+public interface GreetingService {
 
     String sayHello();
 }

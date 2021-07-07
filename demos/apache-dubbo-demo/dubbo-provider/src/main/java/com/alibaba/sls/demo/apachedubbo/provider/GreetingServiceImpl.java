@@ -1,11 +1,11 @@
 package com.alibaba.sls.demo.apachedubbo.provider;
 
-import com.alibaba.sls.demo.apachedubbo.inter.GreetService;
+import com.alibaba.sls.demo.apachedubbo.inter.GreetingService;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Value;
 
 @DubboService(version = "1.0.0")
-public class GreetServiceImpl implements GreetService {
+public class GreetingServiceImpl implements GreetingService {
 
 
     @Value("${dubbo.application.name}")
