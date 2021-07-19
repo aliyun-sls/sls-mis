@@ -13,6 +13,7 @@
 
 ## Dubbo 系列
 1. [Apache Dubbo Demo](./apache-dubbo-demo)
+2. [Alibaba Dubbo Demo](./alibaba-dubbo-demo)
 
 ## Trace与Log互通系列
 1. [Trace-With-Log-Demo](./trace-with-log-demo)
