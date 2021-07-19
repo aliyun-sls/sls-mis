@@ -25,4 +25,4 @@
 
 ## Metric系列
 
-1.[Opentelemetry Metric](./ot-metric-demo)
+1. [Opentelemetry Metric](./ot-metric-demo)
