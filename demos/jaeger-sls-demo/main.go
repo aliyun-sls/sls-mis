@@ -26,7 +26,7 @@ func init() {
 	flag.StringVar(&accessKeyId, "access-key-id", os.Getenv("ACCESS_KEY_ID"), "the access key id")
 	flag.StringVar(&accessKeySecret, "access-key-secret", os.Getenv("ACCESS_KEY_SECRET"), "the access key secret")
 	flag.StringVar(&endPoint, "endPoint", os.Getenv("ENDPOINT"), "the endpoint")
-	flag.StringVar(&service, "service", "jaeger-demo", "the service name")
+	flag.StringVar(&service, "service", os.Getenv("SERVICE_NAME"), "the service name")
 }
 
 func main() {
