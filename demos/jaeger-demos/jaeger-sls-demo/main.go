@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/opentracing/opentracing-go"
-	"github.com/uber/jaeger-client-go"
-	"github.com/uber/jaeger-client-go/config"
 	"io"
 	"os"
 	"time"
+
+	"github.com/opentracing/opentracing-go"
+	"github.com/uber/jaeger-client-go"
+	"github.com/uber/jaeger-client-go/config"
 )
 
 var (
@@ -33,9 +34,13 @@ func main() {
 	tracer, closer := initJaeger()
 	defer closer.Close()
 
-	span := tracer.StartSpan("test")
-	span.SetTag("test", "test")
-	span.Finish()
+	parentSpan := tracer.StartSpan("parent")
+	parentSpan.SetTag("test", "test")
+
+	c := tracer.StartSpan("child", opentracing.ChildOf(parentSpan.Context()))
+
+	c.Finish()
+	parentSpan.Finish()
 
 	time.Sleep(time.Second * 30)
 }
