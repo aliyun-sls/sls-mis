@@ -120,7 +120,7 @@
             }
             helpers.respondSuccessBody(res, JSON.stringify(body), function (span) {
                 if (span) {
-                    return {'trace-id': span.context().traceId}
+                    return {'trace-id': span.spanContext().traceId}
                 }
             }(span));
         }.bind({
@@ -159,7 +159,7 @@
             }
             helpers.respondSuccessBody(res, JSON.stringify(body), function (span) {
                 if (span) {
-                    return {'trace-id': span.context().traceId}
+                    return {'trace-id': span.spanContext().traceId}
                 }
             }(span));
         }.bind({
@@ -197,14 +197,14 @@
                 };
                 return helpers.respondSuccessBody(res, JSON.stringify(body), function (span) {
                     if (span) {
-                        return {'trace-id': span.context().traceId}
+                        return {'trace-id': span.spanContext().traceId}
                     }
                 }(span));
             }
 
             return helpers.respondSuccessBody(res, JSON.stringify({"status_code": 500}), function (span) {
                 if (span) {
-                    return {'trace-id': span.context().traceId}
+                    return {'trace-id': span.spanContext().traceId}
                 }
             }(span));
         }.bind({
@@ -240,14 +240,14 @@
                 var resp = data._embedded.address[0];
                 return helpers.respondSuccessBody(res, JSON.stringify(resp), function (span) {
                     if (span) {
-                        return {'trace-id': span.context().traceId}
+                        return {'trace-id': span.spanContext().traceId}
                     }
                 }(span));
             }
 
             return helpers.respondSuccessBody(res, JSON.stringify({"status_code": 500}), function (span) {
                 if (span) {
-                    return {'trace-id': span.context().traceId}
+                    return {'trace-id': span.spanContext().traceId}
                 }
             }(span));
         }.bind({
@@ -286,7 +286,7 @@
             }
             helpers.respondSuccessBody(res, JSON.stringify(body), function (span) {
                 if (span) {
-                    return {'trace-id': span.context().traceId}
+                    return {'trace-id': span.spanContext().traceId}
                 }
             }(span));
         }.bind({
@@ -320,7 +320,7 @@
             }
             helpers.respondSuccessBody(res, JSON.stringify(body), function (span) {
                 if (span) {
-                    return {'trace-id': span.context().traceId}
+                    return {'trace-id': span.spanContext().traceId}
                 }
             }(span));
         }.bind({
@@ -354,7 +354,7 @@
             }
             helpers.respondSuccessBody(res, JSON.stringify(body), function (span) {
                 if (span) {
-                    return {'trace-id': span.context().traceId}
+                    return {'trace-id': span.spanContext().traceId}
                 }
             }(span));
         }.bind({
@@ -388,7 +388,7 @@
             }
             helpers.respondSuccessBody(res, JSON.stringify(body), function (span) {
                 if (span) {
-                    return {'trace-id': span.context().traceId}
+                    return {'trace-id': span.spanContext().traceId}
                 }
             }(span));
         }.bind({
@@ -479,7 +479,7 @@
                 console.log("set cookie" + custId);
                 res.status(200);
                 if (span) {
-                    res.header('trace-id', span.context().traceId)
+                    res.header('trace-id', span.spanContext().traceId)
                 }
                 res.cookie(cookie_name, req.session.id, {
                     maxAge: 3600000
@@ -566,7 +566,7 @@
                     return;
                 }
                 if (span) {
-                    res.header('trace-id', span.context().traceId)
+                    res.header('trace-id', span.spanContext().traceId)
                 }
                 res.status(200);
                 res.cookie(cookie_name, req.session.id, {

@@ -28,7 +28,7 @@
                 return next(error);
             }
             if (span) {
-                helpers.respondStatusBody(res, response.statusCode, body, {'trace-id': span.context().traceId})
+                helpers.respondStatusBody(res, response.statusCode, body, {'trace-id': span.spanContext().traceId})
             } else {
                 helpers.respondStatusBody(res, response.statusCode, body)
             }
@@ -63,7 +63,7 @@
             }
             console.log('User cart deleted with status: ' + response.statusCode);
             if (span) {
-                helpers.respondStatus(res, response.statusCode, {'trace-id': span.context().traceId});
+                helpers.respondStatus(res, response.statusCode, {'trace-id': span.spanContext().traceId});
             } else {
                 helpers.respondStatus(res, response.statusCode)
             }
@@ -104,14 +104,14 @@
 
             if (error) {
                 if (span) {
-                    helpers.respondStatus(res, response.statusCode, {'trace-id': span.context().traceId});
+                    helpers.respondStatus(res, response.statusCode, {'trace-id': span.spanContext().traceId});
                 } else {
                     helpers.respondStatus(res, response.statusCode)
                 }
             }
             console.log('Item deleted with status: ' + response.statusCode);
             if (span) {
-                helpers.respondStatus(res, response.statusCode, {'trace-id': span.context().traceId});
+                helpers.respondStatus(res, response.statusCode, {'trace-id': span.spanContext().traceId});
             } else {
                 helpers.respondStatus(res, response.statusCode)
             }
@@ -175,7 +175,7 @@
                 return next(new Error("Unable to add to cart. Status code: " + statusCode))
             }
             if (span) {
-                helpers.respondStatus(res, statusCode, {'trace-id': span.context().traceId});
+                helpers.respondStatus(res, statusCode, {'trace-id': span.spanContext().traceId});
             } else {
                 helpers.respondStatus(res, statusCode)
             }
@@ -260,7 +260,7 @@
             }
 
             if (span) {
-                helpers.respondStatus(res, statusCode, {'trace-id': span.context().traceId});
+                helpers.respondStatus(res, statusCode, {'trace-id': span.spanContext().traceId});
             } else {
                 helpers.respondStatus(res, statusCode)
             }
