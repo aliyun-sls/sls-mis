@@ -29,6 +29,8 @@ var (
 	InflightRequests = stdprometheus.NewGaugeVec(stdprometheus.GaugeOpts{
 		Name: "http_inflight_requests",
 	}, []string{"method", "path"})
+
+	globalLogger = log.NewNopLogger()
 )
 
 func init() {
@@ -42,9 +44,10 @@ func WireUp(ctx context.Context, declineAmount float32, serviceName string) (htt
 	// Log domain.
 	var logger log.Logger
 	{
-		logger = log.NewLogfmtLogger(os.Stderr)
+		logger = log.NewJSONLogger(os.Stderr)
 		logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 		logger = log.With(logger, "caller", log.DefaultCaller)
+		globalLogger = logger
 	}
 
 	// Service domain.

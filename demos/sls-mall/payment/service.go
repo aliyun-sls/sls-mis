@@ -1,17 +1,21 @@
 package payment
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"math/rand"
 	"time"
+
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Middleware decorates a service.
 type Middleware func(Service) Service
 
 type Service interface {
-	Authorise(total float32) (Authorisation, error) // GET /paymentAuth
-	Health() []Health                               // GET /health
+	Authorise(ctx context.Context, total float32) (Authorisation, error) // GET /paymentAuth
+	Health(ctx context.Context) []Health                                 // GET /health
 }
 
 type Authorisation struct {
@@ -38,7 +42,15 @@ type service struct {
 	declineOverAmount float32
 }
 
-func (s *service) Authorise(amount float32) (Authorisation, error) {
+func deductFromCart(amount float32) error {
+	if rand.Int()%10 == 0 {
+		time.Sleep(time.Second)
+		return errors.New("Deduct money from your bank card timeout")
+	}
+	return nil
+}
+
+func (s *service) Authorise(ctx context.Context, amount float32) (Authorisation, error) {
 	if amount == 0 {
 		return Authorisation{}, ErrInvalidPaymentAmount
 	}
@@ -53,13 +65,24 @@ func (s *service) Authorise(amount float32) (Authorisation, error) {
 	} else {
 		message = fmt.Sprintf("Payment declined: amount exceeds %.2f", s.declineOverAmount)
 	}
+
+	err := deductFromCart(amount)
+	if err != nil {
+		authorised = false
+		spanContext := trace.SpanContextFromContext(ctx)
+		globalLogger.Log("error", err.Error(),
+			"Authorised", authorised,
+			"traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String())
+	}
+
 	return Authorisation{
 		Authorised: authorised,
 		Message:    message,
-	}, nil
+	}, err
 }
 
-func (s *service) Health() []Health {
+func (s *service) Health(ctx context.Context) []Health {
 	var health []Health
 	app := Health{"payment", "OK", time.Now().String()}
 	health = append(health, app)
