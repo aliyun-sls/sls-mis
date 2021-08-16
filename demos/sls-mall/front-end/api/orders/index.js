@@ -10,18 +10,29 @@
   const {context, trace} = require('@opentelemetry/api');
 
   app.get("/orders", function (req, res, next) {
-    console.log("Request received with body: " + JSON.stringify(req.body));
     var logged_in = req.cookies.logged_in;
     if (!logged_in) {
+      req.log.warn("用户没有登陆")
       throw new Error("User not logged in.");
       return
     }
 
     var custId = req.session.customerId;
+    let childLogging = req.log.child({"cust_id": custId, 'operation': 'GetOrders'});
+    childLogging.info({parameters: req.params, msg: '查看用户订单信息', url: req.url});
     var span = trace.getSpan(context.active());
     async.waterfall([
         function (callback) {
+          let startTime = Math.floor(Date.now() / 1000);
           request(endpoints.ordersUrl + "/orders/search/customerId?sort=date&custId=" + custId, function (error, response, body) {
+            childLogging.info({
+              msg: "调用[order]：获取用户订单信息",
+              isError: error,
+              body: body,
+              url: endpoints.ordersUrl + "/orders/search/customerId?sort=date&custId=" + custId,
+              cost: Math.floor(Date.now() / 1000) - startTime
+            })
+
             if (error) {
               return callback(error);
             }
@@ -60,10 +71,21 @@
     }
 
     var custId = req.session.customerId;
+    let childLogging = req.log.child({"cust_id": custId, 'operation': 'CreateOrder'});
+    childLogging.info({parameters: req.params, msg: '查看用户订单信息', url: req.url});
     var span = trace.getSpan(context.active());
     async.waterfall([
         function (callback) {
+          let startTime = Math.floor(Date.now() / 1000);
           request(endpoints.customersUrl + "/" + custId, function (error, response, body) {
+            childLogging.info({
+              msg: "调用[user]：校验用户是否存在",
+              isError: error || body.status_code === 500,
+              body: body,
+              url: endpoints.customersUrl + "/" + custId,
+              cost: Math.floor(Date.now() / 1000) - startTime
+            })
+
             if (error || body.status_code === 500) {
               callback(error);
               return;
@@ -86,7 +108,16 @@
           async.parallel([
               function (callback) {
                 console.log("GET Request to: " + addressLink);
+                let startTime = Math.floor(Date.now() / 1000);
                 request.get(addressLink, function (error, response, body) {
+                  childLogging.info({
+                    msg: "调用[user]：校验用户地址是否存在",
+                    isError: error,
+                    body: body,
+                    url: addressLink,
+                    cost: Math.floor(Date.now() / 1000) - startTime
+                  })
+
                   if (error) {
                     callback(error);
                     return;
@@ -100,8 +131,16 @@
                 });
               },
               function (callback) {
-                console.log("GET Request to: " + cardLink);
+                let startTime = Math.floor(Date.now() / 1000);
                 request.get(cardLink, function (error, response, body) {
+                  childLogging.info({
+                    msg: "调用[user]：校验用户银行信息",
+                    isError: error,
+                    body: body,
+                    url: addressLink,
+                    cost: Math.floor(Date.now() / 1000) - startTime
+                  })
+
                   if (error) {
                     callback(error);
                     return;
@@ -130,8 +169,17 @@
             json: true,
             body: order
           };
-          console.log("Posting Order: " + JSON.stringify(order));
+          let startTime = Math.floor(Date.now() / 1000);
           request(options, function (error, response, body) {
+            childLogging.info({
+              msg: "调用[user]：创建订单",
+              isError: error,
+              body: body,
+              url: options.uri,
+              parameters: options.body,
+              cost: Math.floor(Date.now() / 1000) - startTime
+            })
+
             if (error) {
               return callback(error);
             }
