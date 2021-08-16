@@ -66,6 +66,7 @@
     console.log("Request received with body: " + JSON.stringify(req.body));
     var logged_in = req.cookies.logged_in;
     if (!logged_in) {
+      req.log.warn("用户没有登陆")
       throw new Error("User not logged in.");
       return
     }

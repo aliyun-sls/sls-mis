@@ -12,15 +12,26 @@
         console.log("integral Request received with body: " + JSON.stringify(req.body));
         var logged_in = req.cookies.logged_in;
         if (!logged_in) {
+            req.log.warn("用户没有登陆")
             throw new Error("User not logged in.");
             return
         }
 
         var custId = req.session.customerId;
+        let childLogging = req.log.child({"cust_id": custId, 'operation': 'GetUserPoint'});
+        childLogging.info({parameters: req.params, msg: '查看用户可用积分', url: req.url});
         async.waterfall([
                 function (callback) {
-                    request("http://integral/usableIntergral?custId=" + custId, function (error, response, body) {
-                    //request("http://127.0.0.1:10000/usableIntergral?custId=888888", function (error, response, body) {
+                    let startTime = Math.floor(Date.now() / 1000);
+                    request(endpoints.integralUrl + "/usableIntergral?custId=" + custId, function (error, response, body) {
+                        childLogging.info({
+                            msg: "调用[user-points]：获取用户可用积分情况",
+                            isError: error || response.statusCode === 404,
+                            body: body,
+                            url: endpoints.integralUrl + "/usableIntergral?custId=" + custId,
+                            cost: Math.floor(Date.now() / 1000) - startTime
+                        })
+
                         if (error) {
                             return callback(error);
                         }
@@ -49,10 +60,21 @@
         }
 
         var custId = req.session.customerId;
+        let childLogging = req.log.child({"cust_id": custId, 'operation': 'GetAllUserPoints'});
+        childLogging.info({parameters: req.params, msg: '查看用户积分总量', url: req.url});
+
         async.waterfall([
                 function (callback) {
-                    request("http://integral//intergralSum?custId=" + custId, function (error, response, body) {
-                    //request("30.43.120.7:10000/intergralSum?custId=888888", function (error, response, body) {
+                    let startTime = Math.floor(Date.now() / 1000);
+                    request(endpoints.integralUrl + "/intergralSum?custId=" + custId, function (error, response, body) {
+                        childLogging.info({
+                            msg: "调用[user-points]：查看用户积分总量",
+                            isError: error || response.statusCode === 404,
+                            body: body,
+                            url: endpoints.integralUrl + "/intergralSum?custId=" + custId,
+                            cost: Math.floor(Date.now() / 1000) - startTime
+                        })
+
                         if (error) {
                             return callback(error);
                         }
