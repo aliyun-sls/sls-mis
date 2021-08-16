@@ -111,7 +111,7 @@
         throw new Error("User not logged in.");
       }
       // Use Session ID instead
-      return req.session.id;
+      return "(anonymous)";
     }
 
     return req.session.customerId;

@@ -1,10 +1,11 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/api');
-const {registerInstrumentations} = require('@opentelemetry/instrumentation');
 const {NodeTracerProvider} = require('@opentelemetry/node');
+const {PinoInstrumentation} = require('@opentelemetry/instrumentation-pino');
+const {registerInstrumentations} = require('@opentelemetry/instrumentation');
 const {SimpleSpanProcessor, ConsoleSpanExporter} = require('@opentelemetry/tracing');
-const grpc = require('grpc');
+const grpc = require('@grpc/grpc-js');
 const {CollectorTraceExporter} = require('@opentelemetry/exporter-collector-grpc');
 
 const {ExpressInstrumentation} = require('@opentelemetry/instrumentation-express');
@@ -19,6 +20,11 @@ module.exports = (parameter) => {
             new HttpInstrumentation(),
             new ExpressInstrumentation({
                 ignoreLayersType: ['middleware']
+            }),
+            new PinoInstrumentation({
+                logHook: (span, record) => {
+                    record['resource.service.name'] = provider.resource.attributes['service.name'];
+                },
             }),
         ],
         tracerProvider: provider,

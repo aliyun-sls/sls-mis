@@ -1,6 +1,7 @@
 const tracer = require('./tracer')(require('./utils')());
 var request = require("request")
     , express = require("express")
+    , logging = require('pino-http')()
     , morgan = require("morgan")
     , path = require("path")
     , bodyParser = require("body-parser")
@@ -19,6 +20,7 @@ var request = require("request")
 
 app.use(helpers.rewriteSlash);
 app.use(metrics);
+app.use(logging)
 app.use(express.static("public"));
 if (process.env.SESSION_REDIS) {
     console.log('Using the redis based session manager');
