@@ -84,9 +84,13 @@
    *   });
    * });
    */
-  helpers.simpleHttpRequest = function(url, res, next) {
+  helpers.simpleHttpRequest = function(url, res, next, loghook) {
     var span = getSpan(context.active());
     request.get(url, function(error, response, body) {
+      if (loghook){
+          loghook(error, response, body)
+      }
+
       if (error) return next(error);
       if (span) {
         helpers.respondSuccessBody(res, body, {'trace-id': span.context().traceId});
