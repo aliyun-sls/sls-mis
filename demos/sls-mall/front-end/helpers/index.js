@@ -3,7 +3,7 @@
 
   var request = require("request");
   var helpers = {};
-  const {context, getSpan} = require('@opentelemetry/api');
+  const {context, trace} = require('@opentelemetry/api');
 
   /* Public: errorHandler is a middleware that handles your errors
    *
@@ -85,7 +85,7 @@
    * });
    */
   helpers.simpleHttpRequest = function(url, res, next, loghook) {
-    var span = getSpan(context.active());
+    var span = trace.getSpan(context.active());
     request.get(url, function(error, response, body) {
       if (loghook){
           loghook(error, response, body)
@@ -93,7 +93,7 @@
 
       if (error) return next(error);
       if (span) {
-        helpers.respondSuccessBody(res, body, {'trace-id': span.context().traceId});
+        helpers.respondSuccessBody(res, body, {'trace-id': span.spanContext().traceId});
       } else {
         helpers.respondSuccessBody(res, body);
       }
