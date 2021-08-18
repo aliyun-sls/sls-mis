@@ -191,10 +191,10 @@ func (s *catalogueService) Tags() ([]string, error) {
 	s.logger.Log("msg", "查询产品标签", "Operation", "ListTags", "sql", query)
 
 	var sleepTime int
-	if rand.Intn(100) > 50 {
+	if rand.Intn(100) > 60 {
 		sleepTime = 0
 	} else {
-		sleepTime = 4
+		sleepTime = 1
 	}
 	rows, err := s.db.Query(query, sleepTime)
 	if err != nil {
