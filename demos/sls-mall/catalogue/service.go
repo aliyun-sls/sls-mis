@@ -5,6 +5,7 @@ package catalogue
 
 import (
 	"errors"
+	"math/rand"
 	"strings"
 	"time"
 
@@ -92,18 +93,19 @@ func (s *catalogueService) List(tags []string, order string, pageNum, pageSize i
 	}
 
 	query += ";"
-
+	s.logger.Log("Operation", "ListProduct", "Sql", query, "Tags", tags, "GroupBy", order)
 	err := s.db.Select(&socks, query, args...)
 	if err != nil {
-		s.logger.Log("database error", err)
+		s.logger.Log("msg", "查询产品列表失败", "Operation", "ListProduct", "Exception", err)
 		return []Sock{}, ErrDBConnection
 	}
+
 	for i, s := range socks {
 		socks[i].ImageURL = []string{s.ImageURL_1, s.ImageURL_2}
 		socks[i].Tags = strings.Split(s.TagString, ",")
 	}
 
-	// DEMO: Change 0 to 850
+	s.logger.Log("msg", "查询产品列表", "Operation", "ListProduct", "产品数量", len(socks), "页数", pageNum, "每页条数", pageSize)
 	time.Sleep(0 * time.Millisecond)
 
 	socks = cut(socks, pageNum, pageSize)
@@ -127,11 +129,11 @@ func (s *catalogueService) Count(tags []string) (int, error) {
 	}
 
 	query += ";"
-
+	s.logger.Log("Operation", "ProductCount", "Sql", query, "SQL参数", tags, "查询产品数量")
 	sel, err := s.db.Prepare(query)
 
 	if err != nil {
-		s.logger.Log("database error", err)
+		s.logger.Log("msg", "查询产品数量失败", "Operation", "ProductCount", "Exception", err)
 		return 0, ErrDBConnection
 	}
 	defer sel.Close()
@@ -140,7 +142,7 @@ func (s *catalogueService) Count(tags []string) (int, error) {
 	err = sel.QueryRow(args...).Scan(&count)
 
 	if err != nil {
-		s.logger.Log("database error", err)
+		s.logger.Log("msg", "查询产品数量失败", "Operation", "ProductCount", "Exception", err)
 		return 0, ErrDBConnection
 	}
 
@@ -150,10 +152,11 @@ func (s *catalogueService) Count(tags []string) (int, error) {
 func (s *catalogueService) Get(id string) (Sock, error) {
 	query := baseQuery + " WHERE sock.sock_id =? GROUP BY sock.sock_id;"
 
+	s.logger.Log("msg", "查询产品详情", "Operation", "GetProductDetail", "产品ID", id, "SQL", query)
 	var sock Sock
 	err := s.db.Get(&sock, query, id)
 	if err != nil {
-		s.logger.Log("database error", err)
+		s.logger.Log("msg", "查询产品详情失败", "Operation", "GetProductDetail", "产品ID", id, "Exception", err)
 		return Sock{}, ErrNotFound
 	}
 
@@ -183,17 +186,20 @@ func (s *catalogueService) Health() []Health {
 
 func (s *catalogueService) Tags() ([]string, error) {
 	var tags []string
-	query := "SELECT name FROM tag;"
-	rows, err := s.db.Query(query)
+	query := "call selectTags(?);"
+
+	s.logger.Log("msg", "查询产品标签", "Operation", "ListTags", "sql", query)
+
+	rows, err := s.db.Query(query, rand.Intn(2))
 	if err != nil {
-		s.logger.Log("database error", err)
+		s.logger.Log("msg", "查询产品标签失败", "Operation", "ListTags", "exception", err)
 		return []string{}, ErrDBConnection
 	}
 	var tag string
 	for rows.Next() {
 		err = rows.Scan(&tag)
 		if err != nil {
-			s.logger.Log("database error", err)
+			s.logger.Log("msg", "查询产品标签失败", "Operation", "ListTags", "exception", err)
 			continue
 		}
 		tags = append(tags, tag)
