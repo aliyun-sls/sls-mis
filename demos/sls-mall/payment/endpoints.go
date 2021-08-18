@@ -29,8 +29,8 @@ func MakeAuthoriseEndpoint(s Service) endpoint.Endpoint {
 		span.SetTag("service", "payment")
 		defer span.Finish()
 		req := request.(AuthoriseRequest)
-		authorisation, err := s.Authorise(req.Amount)
-		return AuthoriseResponse{Authorisation: authorisation, Err: err}, nil
+		authorisation, err := s.Authorise(ctx, req.Amount)
+		return AuthoriseResponse{Authorisation: authorisation, Err: err}, err
 	}
 }
 
@@ -41,7 +41,7 @@ func MakeHealthEndpoint(s Service) endpoint.Endpoint {
 		span, ctx = stdopentracing.StartSpanFromContext(ctx, "health check")
 		span.SetTag("service", "payment")
 		defer span.Finish()
-		health := s.Health()
+		health := s.Health(ctx)
 		return healthResponse{Health: health}, nil
 	}
 }
