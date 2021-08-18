@@ -190,14 +190,21 @@ func (s *catalogueService) Tags() ([]string, error) {
 
 	s.logger.Log("msg", "查询产品标签", "Operation", "ListTags", "sql", query)
 
-	rows, err := s.db.Query(query, rand.Intn(2))
+	var sleepTime int
+	if rand.Intn(100) > 50 {
+		sleepTime = 0
+	} else {
+		sleepTime = 4
+	}
+	rows, err := s.db.Query(query, sleepTime)
 	if err != nil {
 		s.logger.Log("msg", "查询产品标签失败", "Operation", "ListTags", "exception", err)
 		return []string{}, ErrDBConnection
 	}
-	var tag string
 	for rows.Next() {
-		err = rows.Scan(&tag)
+		var id int
+		var tag string
+		err = rows.Scan(&id, &tag)
 		if err != nil {
 			s.logger.Log("msg", "查询产品标签失败", "Operation", "ListTags", "exception", err)
 			continue
