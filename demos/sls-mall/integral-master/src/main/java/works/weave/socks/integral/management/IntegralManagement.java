@@ -26,15 +26,15 @@ public class IntegralManagement {
     @Autowired
     private ReduceIntegralDetailDao reduceIntegralDetailDao;
 
-    @Transactional(rollbackFor=Exception.class)
-    public boolean  addIntegral(IntegralRecord integralRecord, UsableIntegral usableIntegral) {
+    @Transactional(rollbackFor = Exception.class)
+    public boolean addIntegral(IntegralRecord integralRecord, UsableIntegral usableIntegral) {
         integralRecordDao.save(integralRecord);
         usableIntegral.setRecordId(integralRecord.getId());
         usableIntegralDao.save(usableIntegral);
         return true;
     }
 
-    @Transactional(rollbackFor=Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public Boolean batchIntegral(List<UsableIntegral> usableIntegrals, List<ReduceIntegralDetail> reduceIntegralDetails) {
         usableIntegralDao.updateExpire(usableIntegrals);
         int saveNum = reduceIntegralDetailDao.batchAdd(reduceIntegralDetails);
