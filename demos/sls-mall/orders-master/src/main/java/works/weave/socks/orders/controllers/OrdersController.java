@@ -56,7 +56,7 @@ public class OrdersController {
             if (item.address == null || item.customer == null || item.card == null || item.items == null) {
                 throw new InvalidOrderException("Invalid order request. Order requires customer, address, card and items.");
             }
-            LOG.debug("Starting calls");
+
             Future<Resource<Address>> addressFuture = asyncGetService.getResource(item.address, new TypeReferences
                     .ResourceType<Address>() {
             });
@@ -68,8 +68,8 @@ public class OrdersController {
             });
             Future<List<Item>> itemsFuture = asyncGetService.getDataList(item.items, new
                     ParameterizedTypeReference<List<Item>>() {
-            });
-            LOG.debug("End of calls.");
+                    });
+
             float amount = calculateTotal(itemsFuture.get(timeout, TimeUnit.SECONDS));
             // Call payment service to make sure they've paid
             PaymentRequest paymentRequest = new PaymentRequest(
@@ -77,22 +77,27 @@ public class OrdersController {
                     cardFuture.get(timeout, TimeUnit.SECONDS).getContent(),
                     customerFuture.get(timeout, TimeUnit.SECONDS).getContent(),
                     amount);
-            LOG.info("Sending payment request: " + paymentRequest);
+            LOG.info("创建订单：调用[user]后台服务-检验用户地址是否存在. {}", paymentRequest.getAddress() != null);
+            LOG.info("创建订单：调用[user]后台服务-检验用户银行卡是否存在. {}", paymentRequest.getCard() != null);
+            LOG.info("创建订单：调用[user]后台服务-检验用户是否是否存在. {}", paymentRequest.getCustomer() != null);
             Future<PaymentResponse> paymentFuture = asyncGetService.postResource(
                     config.getPaymentUri(),
                     paymentRequest,
                     new ParameterizedTypeReference<PaymentResponse>() {
                     });
             PaymentResponse paymentResponse = paymentFuture.get(timeout, TimeUnit.SECONDS);
-            LOG.info("Received payment response: " + paymentResponse);
             if (paymentResponse == null) {
+                LOG.info("创建订单：调用[payment]后台服务-调用支付接口超时.");
                 throw new PaymentDeclinedException("Unable to parse authorisation packet");
             }
             if (!paymentResponse.isAuthorised()) {
+                LOG.info("创建订单：调用[payment]后台服务-调用支付接口鉴权失败. 失败原因：{}", paymentResponse.getMessage());
                 throw new PaymentDeclinedException(paymentResponse.getMessage());
             }
 
+            LOG.info("创建订单：调用[payment]后台服务-调用支付接口成功.");
             // Ship
+
             String customerId = parseId(customerFuture.get(timeout, TimeUnit.SECONDS).getId().getHref());
             Future<Shipment> shipmentFuture = asyncGetService.postResource(config.getShippingUri(), new Shipment
                     (customerId), new ParameterizedTypeReference<Shipment>() {
@@ -109,11 +114,18 @@ public class OrdersController {
                     Calendar.getInstance().getTime(),
                     amount);
 
+            if (shipmentFuture.get(timeout, TimeUnit.SECONDS) == null) {
+                LOG.warn("创建订单：调用[shipping]后台服务-调用发货接口失败.");
+            } else {
+                LOG.warn("创建订单：调用[shipping]后台服务-调用发货成功. Shipping: {}, ShippingName:{}",
+                        shipmentFuture.get(timeout, TimeUnit.SECONDS).getId(),
+                        shipmentFuture.get(timeout, TimeUnit.SECONDS).getName());
+            }
 
             LOG.info("Received data: " + order.toString());
 
             CustomerOrder savedOrder = customerOrderRepository.save(order);
-            LOG.info("Saved order: " + savedOrder);
+            LOG.info("创建订单：创建订单成功: 客户ID: {}, 订单ID: {}", savedOrder.getCustomerId(), savedOrder.getId());
 
             Date date = new Date();
             Calendar cal = Calendar.getInstance();
@@ -129,8 +141,8 @@ public class OrdersController {
             Future<String> stringFuture = asyncGetService.postResource(config.getAntiCheatingUri(), integralRecord,
                     new ParameterizedTypeReference<String>() {
                     });
-            LOG.info("integral :{} " + stringFuture.get());
-
+            LOG.info("创建订单：调用用户积分接口: 客户ID: {}, 订单ID: {}, Value: {}", integralRecord.getUserId(), integralRecord.getOriginalId(),
+                    integralRecord.getValue());
             return savedOrder;
         } catch (TimeoutException e) {
             throw new IllegalStateException("Unable to create order due to timeout from one of the services.", e);
@@ -168,7 +180,7 @@ public class OrdersController {
     private float calculateTotal(List<Item> items) {
         float amount = 0F;
         float shipping = 4.99F;
-        LOG.info("calculateTotal items:{}",items);
+        LOG.info("calculateTotal items:{}", items);
         amount += items.stream().mapToDouble(i -> i.getQuantity() * i.getUnitPrice()).sum();
         amount += shipping;
         return amount;
