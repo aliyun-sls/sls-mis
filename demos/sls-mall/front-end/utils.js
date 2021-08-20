@@ -2,7 +2,6 @@ process = require('process');
 
 const project = process.env.PROJECT;
 const instance = process.env.INSTANCE;
-const service_name = process.env.SERVICE_NAME || "front-end";
 const access_key_id = process.env.ACCESS_KEY_ID;
 const access_secret = process.env.ACCESS_SECRET;
 const endpoint = process.env.ENDPOINT;
@@ -24,7 +23,7 @@ module.exports = () => {
     return {
         project: project,
         instance: instance,
-        service_name: service_name,
+        service_name: "front-end",
         access_key_id: access_key_id,
         access_secret: access_secret,
         endpoint: endpoint,

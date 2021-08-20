@@ -26,6 +26,7 @@
     "@opentelemetry/instrumentation-http": "^0.24.0",
     "@opentelemetry/instrumentation-pino": "^0.24.0",
     "@opentelemetry/node": "^0.24.0",
+    "@opentelemetry/sdk-trace-node": "^0.24.1-alpha.4",
     "@opentelemetry/tracing": "^0.24.0",
     "async": "^1.5.2",
     "body-parser": "^1.15.1",

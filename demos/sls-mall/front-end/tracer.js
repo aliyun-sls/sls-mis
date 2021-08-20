@@ -1,9 +1,11 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/api');
-const {NodeTracerProvider} = require('@opentelemetry/node');
-const {PinoInstrumentation} = require('@opentelemetry/instrumentation-pino');
 const {registerInstrumentations} = require('@opentelemetry/instrumentation');
+const {NodeTracerProvider} = require('@opentelemetry/sdk-trace-node');
+const {Resource} = require('@opentelemetry/resources');
+const {SemanticResourceAttributes} = require('@opentelemetry/semantic-conventions');
+const {PinoInstrumentation} = require('@opentelemetry/instrumentation-pino');
 const {SimpleSpanProcessor, ConsoleSpanExporter} = require('@opentelemetry/tracing');
 const grpc = require('@grpc/grpc-js');
 const {CollectorTraceExporter} = require('@opentelemetry/exporter-collector-grpc');
@@ -12,9 +14,12 @@ const {ExpressInstrumentation} = require('@opentelemetry/instrumentation-express
 const {HttpInstrumentation} = require('@opentelemetry/instrumentation-http');
 
 module.exports = (parameter) => {
-    const provider = new NodeTracerProvider();
+    const provider = new NodeTracerProvider({
+        resource: new Resource({
+            [SemanticResourceAttributes.SERVICE_NAME]: parameter.service_name,
+        })
+    });
     provider.register();
-
     registerInstrumentations({
         instrumentations: [
             new HttpInstrumentation(),
@@ -23,7 +28,7 @@ module.exports = (parameter) => {
             }),
             new PinoInstrumentation({
                 logHook: (span, record) => {
-                    record['resource.service.name'] = provider.resource.attributes['service.name'];
+                    record['resource.service.name'] = "front-end";
                 },
             }),
         ],
@@ -35,7 +40,6 @@ module.exports = (parameter) => {
     meta.add('x-sls-otel-ak-id', parameter.access_key_id);
     meta.add('x-sls-otel-ak-secret', parameter.access_secret);
     const collectorOptions = {
-        serviceName: parameter.service_name,
         url: parameter.endpoint,
         credentials: grpc.credentials.createSsl(),
         metadata: meta
