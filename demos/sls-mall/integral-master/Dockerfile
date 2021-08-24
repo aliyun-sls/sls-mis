@@ -10,7 +10,8 @@ ENV PROJECT="" \
     DATABASE_HOST="integral-db" \
     DATABASE_NAME="integral" \
     DATABASE_USER="root" \
-    DATABASE_PASSWORD=""
+    DATABASE_PASSWORD="" \
+    DEPLOYMENT_ENVIRONMENT="production"
 
 WORKDIR /sls-mall
 COPY target/integral.jar ./app.jar
