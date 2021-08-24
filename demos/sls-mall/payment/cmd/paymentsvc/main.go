@@ -28,6 +28,8 @@ const (
 // Log domain.
 var logger log.Logger
 var otlpEndpoint string
+var environment string
+var version string
 
 var (
 	port          = flag.String("port", "8080", "Port to bind HTTP listener")
@@ -36,6 +38,8 @@ var (
 
 func init() {
 	flag.StringVar(&otlpEndpoint, "otlp-endpoint", os.Getenv("OTLP_ENDPOINT"), "otlp endpoint")
+	flag.StringVar(&environment, "deployment_environment", os.Getenv("DEPLOYMENT_ENVIRONMENT"), "deployment environment")
+	flag.StringVar(&version, "service_version", os.Getenv("SERVICE_VERSION"), "service version")
 }
 
 func initTracer() {
@@ -79,7 +83,12 @@ func initTracer() {
 	tp := sdktrace.NewTracerProvider(sdktrace.WithConfig(sdktrace.Config{DefaultSampler: sdktrace.AlwaysSample()}),
 		sdktrace.WithSyncer(traceExporter),
 		//sdktrace.WithSyncer(&TTE{}),
-		sdktrace.WithResource(resource.NewWithAttributes(semconv.ServiceNameKey.String("payment"), semconv.HostNameKey.String(hostname))))
+		sdktrace.WithResource(resource.NewWithAttributes(
+			semconv.ServiceNameKey.String("payment"),
+			semconv.HostNameKey.String(hostname),
+			semconv.DeploymentEnvironmentKey.String(environment),
+			semconv.ServiceVersionKey.String(version),
+		)))
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 }
