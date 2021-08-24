@@ -1,5 +1,5 @@
 IMAGE_NAME := sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/queue-master
-IMAGE_VERSION := 1.0.0
+IMAGE_VERSION := 1.1.0
 
 build_project:
 	 ./mvnw clean package -Dmaven.test.skip=true
