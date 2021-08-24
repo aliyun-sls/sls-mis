@@ -12,11 +12,15 @@ const {CollectorTraceExporter} = require('@opentelemetry/exporter-collector-grpc
 
 const {ExpressInstrumentation} = require('@opentelemetry/instrumentation-express');
 const {HttpInstrumentation} = require('@opentelemetry/instrumentation-http');
+const {hostname} = require("os");
 
 module.exports = (parameter) => {
     const provider = new NodeTracerProvider({
         resource: new Resource({
             [SemanticResourceAttributes.SERVICE_NAME]: parameter.service_name,
+            [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: "production",
+            [SemanticResourceAttributes.SERVICE_VERSION]: parameter.version,
+            [SemanticResourceAttributes.HOST_NAME]: hostname()
         })
     });
     provider.register();
@@ -38,6 +42,7 @@ module.exports = (parameter) => {
     meta.add('x-sls-otel-project', parameter.project);
     meta.add('x-sls-otel-instance-id', parameter.instance);
     meta.add('x-sls-otel-ak-id', parameter.access_key_id);
+    meta.add('x-sls-otel-ak-secret', parameter.access_secret);
     meta.add('x-sls-otel-ak-secret', parameter.access_secret);
     const collectorOptions = {
         url: parameter.endpoint,

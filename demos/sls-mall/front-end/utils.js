@@ -27,6 +27,7 @@ module.exports = () => {
         access_key_id: access_key_id,
         access_secret: access_secret,
         endpoint: endpoint,
+        version: "1.1.0"
     }
 }
 
