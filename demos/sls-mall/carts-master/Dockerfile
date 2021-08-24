@@ -6,7 +6,8 @@ ENV PROJECT="" \
     ENDPOINT="" \
     SERVICE_NAME="carts" \
     SERVICE_VERSION="1.0.0" \
-    SERVICE_HOST="127.0.0.1"
+    SERVICE_HOST="127.0.0.1" \
+    DEPLOYMENT_ENVIRONMENT="production"
 
 WORKDIR /sls-mall
 COPY target/carts.jar ./app.jar
