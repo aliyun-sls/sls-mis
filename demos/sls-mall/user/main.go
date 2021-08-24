@@ -19,14 +19,15 @@ import (
 )
 
 var (
-	port           string
-	project        string
-	instance       string
-	accessKeyId    string
-	endpoint       string
-	serviceName    string
-	serviceVersion string
-	accessSecret   string
+	port                  string
+	project               string
+	instance              string
+	accessKeyId           string
+	endpoint              string
+	serviceName           string
+	serviceVersion        string
+	accessSecret          string
+	deploymentEnvironment string
 )
 
 const (
@@ -41,6 +42,7 @@ func init() {
 	flag.StringVar(&endpoint, "endpoint", os.Getenv("ENDPOINT"), "Zipkin address")
 	flag.StringVar(&serviceName, "serviceName", os.Getenv("SERVICE_NAME"), "Zipkin address")
 	flag.StringVar(&serviceVersion, "serviceVersion", os.Getenv("SERVICE_VERSION"), "Zipkin address")
+	flag.StringVar(&deploymentEnvironment, "deployment_environment", os.Getenv("DEPLOYMENT_ENVIRONMENT"), "deployment environment")
 	flag.StringVar(&port, "port", "8084", "Port on which to run")
 	db.Register("mongodb", &mongodb.Mongo{})
 }
@@ -65,8 +67,13 @@ func main() {
 		os.Exit(1)
 	}
 	defer conn.Close()
-
+	hostname, _ := os.Hostname()
 	slsConfig, err := provider.NewConfig(provider.WithServiceName(serviceName),
+		provider.WithResourceAttributes(map[string]string{
+			"host.name": hostname,
+			"deployment.environment": deploymentEnvironment,
+			"telemetry.sdk.language": "go",
+		}),
 		provider.WithServiceVersion(serviceVersion),
 		provider.WithTraceExporterEndpoint(endpoint),
 		provider.WithSLSConfig(project, instance, accessKeyId, accessSecret))
