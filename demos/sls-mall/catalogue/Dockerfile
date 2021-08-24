@@ -4,7 +4,9 @@ ENV OTLP_ENDPOINT="" \
     MYSQL_USER="root" \
     MYSQL_HOST="mysql" \
     MYSQL_PASSWORD="root" \
-    MYSQL_DATABASE="socksdb"
+    MYSQL_DATABASE="socksdb" \
+    DEPLOYMENT_ENVIRONMENT="production" \
+    SERVICE_VERSION="1.1.0"
 
 WORKDIR /sls-mall
 
