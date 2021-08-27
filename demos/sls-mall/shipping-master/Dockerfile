@@ -5,8 +5,7 @@ ENV PROJECT="" \
     INSTANCE="" \
     ENDPOINT="" \
     SERVICE_NAME="shipping" \
-    SERVICE_VERSION="1.0.0" \
-    SERVICE_HOST="127.0.0.1" \
+    SERVICE_VERSION="1.1.0" \
     DEPLOYMENT_ENVIRONMENT="production"
 
 WORKDIR /sls-mall
