@@ -2,13 +2,17 @@
 
 const opentelemetry = require('@opentelemetry/api');
 const {registerInstrumentations} = require('@opentelemetry/instrumentation');
-const {NodeTracerProvider} = require('@opentelemetry/node');
+const {NodeTracerProvider} = require('@opentelemetry/sdk-trace-node');
+const {Resource} = require('@opentelemetry/resources');
+const {SemanticResourceAttributes} = require('@opentelemetry/semantic-conventions');
+const {PinoInstrumentation} = require('@opentelemetry/instrumentation-pino');
 const {SimpleSpanProcessor, ConsoleSpanExporter} = require('@opentelemetry/tracing');
-const grpc = require('grpc');
+const grpc = require('@grpc/grpc-js');
 const {CollectorTraceExporter} = require('@opentelemetry/exporter-collector-grpc');
 
 const {ExpressInstrumentation} = require('@opentelemetry/instrumentation-express');
 const {HttpInstrumentation} = require('@opentelemetry/instrumentation-http');
+const {hostname} = require("os");
 
 module.exports = (parameter) => {
     const provider = new NodeTracerProvider();
