@@ -1,0 +1,11 @@
+CREATE TABLE T_CUSTOMER
+(
+    id   INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255)
+);
+
+CREATE TABLE T_ORDER
+(
+    id   INT,
+    name VARCHAR(255)
+);

@@ -1,0 +1,19 @@
+server:
+  port: 9081
+spring:
+  application:
+    name: backend
+  jpa:
+    generate-ddl: false
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:test_mem
+    username: sa
+    password:
+  sql:
+    init:
+      data-locations: classpath:data.sql
+      schema-locations: classpath:schema.sql
