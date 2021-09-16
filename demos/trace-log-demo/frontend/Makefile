@@ -1,5 +1,5 @@
 NODE_DOCKER_NAME := sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/trace-log-demo/frontend
-NODE_DOCKER_VERSION := 0.18.2
+NODE_DOCKER_VERSION := 1.0.0
 
 clean_images:
 	docker image prune -f
