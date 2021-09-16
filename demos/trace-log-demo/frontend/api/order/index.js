@@ -6,7 +6,7 @@
         , app = express()
     const {context, trace} = require('@opentelemetry/api');
 
-    app.get("/orders", function (req, res, next) {
+    app.get("/createOrders", function (req, res, next) {
         let childLogging = req.log.child({'operation': 'CreateOrder'});
         childLogging.info({parameters: req.query, msg: '创建订单请求', url: req.url});
         let options = {
