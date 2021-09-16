@@ -32,7 +32,7 @@ module.exports = (parameter) => {
             }),
             new PinoInstrumentation({
                 logHook: (span, record) => {
-                    record['resource.service.name'] = "front-end";
+                    record['resource.service.name'] = "frontend";
                 },
             }),
         ],
