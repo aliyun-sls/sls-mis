@@ -49,11 +49,10 @@
     });
 
     function respondSuccessBody(res, statusCode, body, headers) {
-        if (headers) {
-            res.writeHeader(statusCode, headers);
-        } else {
-            res.writeHeader(statusCode);
-        }
+        res.charset = "utf-8"
+        res.contentType("application/json")
+
+        res.writeHeader(statusCode, headers);
         res.write(body);
         res.end();
     }
