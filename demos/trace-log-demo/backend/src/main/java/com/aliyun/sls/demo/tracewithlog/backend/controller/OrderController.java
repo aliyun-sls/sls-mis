@@ -1,6 +1,5 @@
 package com.aliyun.sls.demo.tracewithlog.backend.controller;
 
-import com.aliyun.sls.demo.tracewithlog.backend.entity.Order;
 import com.aliyun.sls.demo.tracewithlog.backend.exception.CustomerNotExistException;
 import com.aliyun.sls.demo.tracewithlog.backend.services.OrderService;
 import org.slf4j.Logger;
@@ -10,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 @RestController
 public class OrderController {
@@ -22,6 +23,13 @@ public class OrderController {
     @RequestMapping(method = RequestMethod.GET, value = "/createOrder")
     public Request createOrder(@RequestParam("id") int id, @RequestParam("name") String name) {
         try {
+            if (id % 3 == 0) {
+                try {
+                    Thread.sleep(ThreadLocalRandom.current().nextInt(3) * 1000);
+                } catch (InterruptedException e) {
+                }
+            }
+
             logger.info("创建订单参数为: 客户ID: {}, 商品名字：{}", id, name);
             return Request.ofSuccess(orderService.createOrder(id, name));
         } catch (CustomerNotExistException e) {
