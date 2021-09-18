@@ -80,6 +80,19 @@ public class OrdersController {
             LOG.info("创建订单：调用[user]后台服务-检验用户地址是否存在. {}", paymentRequest.getAddress() != null);
             LOG.info("创建订单：调用[user]后台服务-检验用户银行卡是否存在. {}", paymentRequest.getCard() != null);
             LOG.info("创建订单：调用[user]后台服务-检验用户是否是否存在. {}", paymentRequest.getCustomer() != null);
+
+            CustomerOrder order = new CustomerOrder(
+                    null,
+                    customerFuture.get(timeout, TimeUnit.SECONDS).getContent().getId(),
+                    customerFuture.get(timeout, TimeUnit.SECONDS).getContent(),
+                    addressFuture.get(timeout, TimeUnit.SECONDS).getContent(),
+                    cardFuture.get(timeout, TimeUnit.SECONDS).getContent(),
+                    itemsFuture.get(timeout, TimeUnit.SECONDS),
+                    Calendar.getInstance().getTime(),
+                    amount);
+
+            CustomerOrder savedOrder = customerOrderRepository.save(order);
+            LOG.info("创建订单：创建订单成功: 客户ID: {}, 订单ID: {}", savedOrder.getCustomerId(), savedOrder.getId());
             Future<PaymentResponse> paymentFuture = asyncGetService.postResource(
                     config.getPaymentUri(),
                     paymentRequest,
@@ -87,14 +100,19 @@ public class OrdersController {
                     });
             PaymentResponse paymentResponse = paymentFuture.get(timeout, TimeUnit.SECONDS);
             if (paymentResponse == null) {
-                LOG.info("创建订单：调用[payment]后台服务-调用支付接口超时.");
+                savedOrder.setStatus("Payment timeout");
+                customerOrderRepository.save(savedOrder);
+                LOG.info("创建订单：订单ID: {} 调用[payment]后台服务-调用支付接口超时.", savedOrder.getId());
                 throw new PaymentDeclinedException("Unable to parse authorisation packet");
             }
             if (!paymentResponse.isAuthorised()) {
-                LOG.info("创建订单：调用[payment]后台服务-调用支付接口鉴权失败. 失败原因：{}", paymentResponse.getMessage());
+                savedOrder.setStatus("Payment unauthorized");
+                customerOrderRepository.save(savedOrder);
+                LOG.info("创建订单：订单ID: {} 调用[payment]后台服务-调用支付接口鉴权失败. 失败原因：{}", savedOrder.getId(), paymentResponse.getMessage());
                 throw new PaymentDeclinedException(paymentResponse.getMessage());
             }
-
+            savedOrder.setStatus("payed");
+            customerOrderRepository.save(savedOrder);
             LOG.info("创建订单：调用[payment]后台服务-调用支付接口成功.");
             // Ship
 
@@ -103,29 +121,17 @@ public class OrdersController {
                     (customerId), new ParameterizedTypeReference<Shipment>() {
             });
 
-            CustomerOrder order = new CustomerOrder(
-                    null,
-                    customerId,
-                    customerFuture.get(timeout, TimeUnit.SECONDS).getContent(),
-                    addressFuture.get(timeout, TimeUnit.SECONDS).getContent(),
-                    cardFuture.get(timeout, TimeUnit.SECONDS).getContent(),
-                    itemsFuture.get(timeout, TimeUnit.SECONDS),
-                    shipmentFuture.get(timeout, TimeUnit.SECONDS),
-                    Calendar.getInstance().getTime(),
-                    amount);
-
             if (shipmentFuture.get(timeout, TimeUnit.SECONDS) == null) {
+                savedOrder.setStatus("shipping failed");
+                customerOrderRepository.save(savedOrder);
                 LOG.warn("创建订单：调用[shipping]后台服务-调用发货接口失败.");
             } else {
+                savedOrder.setStatus("shipped");
+                customerOrderRepository.save(savedOrder);
                 LOG.warn("创建订单：调用[shipping]后台服务-调用发货成功. Shipping: {}, ShippingName:{}",
                         shipmentFuture.get(timeout, TimeUnit.SECONDS).getId(),
                         shipmentFuture.get(timeout, TimeUnit.SECONDS).getName());
             }
-
-            LOG.info("Received data: " + order.toString());
-
-            CustomerOrder savedOrder = customerOrderRepository.save(order);
-            LOG.info("创建订单：创建订单成功: 客户ID: {}, 订单ID: {}", savedOrder.getCustomerId(), savedOrder.getId());
 
             Date date = new Date();
             Calendar cal = Calendar.getInstance();
@@ -143,6 +149,9 @@ public class OrdersController {
                     });
             LOG.info("创建订单：调用用户积分接口: 客户ID: {}, 订单ID: {}, Value: {}", integralRecord.getUserId(), integralRecord.getOriginalId(),
                     integralRecord.getValue());
+
+            savedOrder.setStatus("finished");
+            customerOrderRepository.save(savedOrder);
             return savedOrder;
         } catch (TimeoutException e) {
             throw new IllegalStateException("Unable to create order due to timeout from one of the services.", e);

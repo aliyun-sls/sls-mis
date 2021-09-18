@@ -36,22 +36,24 @@ public class CustomerOrder {
 
     private Date date = Calendar.getInstance().getTime();
 
+    private String status;
+
     private float total;
 
     public CustomerOrder() {
     }
 
     public CustomerOrder(String id, String customerId, Customer customer, Address address, Card card,
-                         Collection<Item> items, Shipment shipment, Date date, float total) {
+                         Collection<Item> items, Date date, float total) {
         this.id = id;
         this.customerId = customerId;
         this.customer = customer;
         this.address = address;
         this.card = card;
         this.items = items;
-        this.shipment = shipment;
         this.date = date;
         this.total = total;
+        this.status = "Paying";
     }
 
     @Override
@@ -144,5 +146,13 @@ public class CustomerOrder {
 
     public void setTotal(float total) {
         this.total = total;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
