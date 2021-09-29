@@ -131,7 +131,8 @@
                         <configuration>
                             <url>${ot-agent.download.url}</url>
                             <fromFile>${ot-agent.version}/opentelemetry-javaagent-all.jar</fromFile>
-                            <toDir>${project.build.directory}</toDir>
+                            <toDir>${project.basedir}/agents</toDir>
+                            <skipIfExists>true</skipIfExists>
                         </configuration>
                     </execution>
                 </executions>

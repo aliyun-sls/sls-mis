@@ -12,7 +12,7 @@ import java.util.List;
 @RepositoryRestResource(path = "orders", itemResourceRel = "order")
 public interface CustomerOrderRepository extends MongoRepository<CustomerOrder, String> {
     @RestResource(path = "customerId")
-    List<CustomerOrder> findTop10ByCustomerIdOrderByDateDesc(@Param("custId") String id);
+    List<CustomerOrder> findTop30ByCustomerIdOrderByDateDesc(@Param("custId") String id);
 
 
 }

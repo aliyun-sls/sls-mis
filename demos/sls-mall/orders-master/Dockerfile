@@ -10,7 +10,7 @@ ENV PROJECT="" \
 
 WORKDIR /sls-mall
 COPY target/orders.jar ./app.jar
-COPY target/opentelemetry-javaagent-all.jar .
+COPY agents/opentelemetry-javaagent-all.jar .
 COPY startup.sh .
 RUN chmod +x startup.sh
 EXPOSE 8086

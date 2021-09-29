@@ -23,10 +23,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,22 +74,28 @@ public class OrdersController {
                     cardFuture.get(timeout, TimeUnit.SECONDS).getContent(),
                     customerFuture.get(timeout, TimeUnit.SECONDS).getContent(),
                     amount);
-            LOG.info("创建订单：调用[user]后台服务-检验用户地址是否存在. {}", paymentRequest.getAddress() != null);
-            LOG.info("创建订单：调用[user]后台服务-检验用户银行卡是否存在. {}", paymentRequest.getCard() != null);
-            LOG.info("创建订单：调用[user]后台服务-检验用户是否是否存在. {}", paymentRequest.getCustomer() != null);
+            LOG.info("创建订单：调用[user]后台服务-检验用户地址是否存在. 后端返回：{}", paymentRequest.getAddress());
+            LOG.info("创建订单：调用[user]后台服务-检验用户银行卡是否存在. 后端返回：{}", paymentRequest.getCard());
+            LOG.info("创建订单：调用[user]后台服务-检验用户是否是否存在. 后端返回：{}", paymentRequest.getCustomer());
+            String customerId = parseId(customerFuture.get(timeout, TimeUnit.SECONDS).getId().getHref());
 
             CustomerOrder order = new CustomerOrder(
                     null,
-                    customerFuture.get(timeout, TimeUnit.SECONDS).getContent().getId(),
-                    customerFuture.get(timeout, TimeUnit.SECONDS).getContent(),
-                    addressFuture.get(timeout, TimeUnit.SECONDS).getContent(),
-                    cardFuture.get(timeout, TimeUnit.SECONDS).getContent(),
+                    customerId,
+                    paymentRequest.getCustomer(),
+                    paymentRequest.getAddress(),
+                    paymentRequest.getCard(),
                     itemsFuture.get(timeout, TimeUnit.SECONDS),
                     Calendar.getInstance().getTime(),
                     amount);
 
             CustomerOrder savedOrder = customerOrderRepository.save(order);
-            LOG.info("创建订单：创建订单成功: 客户ID: {}, 订单ID: {}", savedOrder.getCustomerId(), savedOrder.getId());
+            LOG.info("创建订单：创建订单成功: 客户ID: {}, 订单ID: {}", customerId, savedOrder.getId());
+
+            if (ThreadLocalRandom.current().nextInt(1000) < 10) {
+                return savedOrder;
+            }
+
             Future<PaymentResponse> paymentFuture = asyncGetService.postResource(
                     config.getPaymentUri(),
                     paymentRequest,
@@ -100,13 +103,13 @@ public class OrdersController {
                     });
             PaymentResponse paymentResponse = paymentFuture.get(timeout, TimeUnit.SECONDS);
             if (paymentResponse == null) {
-                savedOrder.setStatus("Payment timeout");
+                savedOrder.setStatus("Payment failure");
                 customerOrderRepository.save(savedOrder);
                 LOG.info("创建订单：订单ID: {} 调用[payment]后台服务-调用支付接口超时.", savedOrder.getId());
                 throw new PaymentDeclinedException("Unable to parse authorisation packet");
             }
             if (!paymentResponse.isAuthorised()) {
-                savedOrder.setStatus("Payment unauthorized");
+                savedOrder.setStatus("Payment failure");
                 customerOrderRepository.save(savedOrder);
                 LOG.info("创建订单：订单ID: {} 调用[payment]后台服务-调用支付接口鉴权失败. 失败原因：{}", savedOrder.getId(), paymentResponse.getMessage());
                 throw new PaymentDeclinedException(paymentResponse.getMessage());
@@ -116,13 +119,13 @@ public class OrdersController {
             LOG.info("创建订单：调用[payment]后台服务-调用支付接口成功.");
             // Ship
 
-            String customerId = parseId(customerFuture.get(timeout, TimeUnit.SECONDS).getId().getHref());
+
             Future<Shipment> shipmentFuture = asyncGetService.postResource(config.getShippingUri(), new Shipment
                     (customerId), new ParameterizedTypeReference<Shipment>() {
             });
 
             if (shipmentFuture.get(timeout, TimeUnit.SECONDS) == null) {
-                savedOrder.setStatus("shipping failed");
+                savedOrder.setStatus("shipping failure");
                 customerOrderRepository.save(savedOrder);
                 LOG.warn("创建订单：调用[shipping]后台服务-调用发货接口失败.");
             } else {
