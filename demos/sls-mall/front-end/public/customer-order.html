@@ -103,7 +103,7 @@ _________________________________________________________ -->
                     <h2>Order #<span id="orderNumber"></span></h2>
 
                     <p class="lead">Order was placed on
-                        <strong id="orderDate"></strong> and is currently <strong id="orderStatus"></strong>.</p>
+                        <strong id="orderDate"></strong> and is currently <strong id="orderStatus" class="label"></strong>.</p>
                     <p class="text-muted">If you have any questions, please feel
                         free to <a href="#">contact us</a>, our
                         customer service center is working for you 24/7.</p>
@@ -209,10 +209,16 @@ _________________________________________________________ -->
             var cartTotal = 0;
             var numItemsInCart = 0;
             var shipping = 4.99;
+            var status = data.status
             //$('#orderTotal').text('$' + data.total.toFixed(2));
             $('#orderNumber').text(id);
             $('#orderDate').text(data.date.split(".")[0].replace("T", " "));
-            $('#orderStatus').text("shipped");
+            $('#orderStatus').text(status);
+            var labelCss = "label-success"
+            if (status.includes("failure")) {
+                labelCss = "label-danger"
+            }
+            $('#orderStatus').addClass(labelCss);
             $.each(data.items, function (index, item) {
                 $.getJSON('/catalogue/' + item.itemId, function (data) {
                     console.log(JSON.stringify(data));
