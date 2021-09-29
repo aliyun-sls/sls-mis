@@ -1,7 +1,16 @@
 const tracer = require('./tracer')(require('./utils')());
 var request = require("request")
     , express = require("express")
-    , logging = require('pino-http')()
+    , logging = require('pino-http')({
+    serializers: {
+        req(req) {
+            return {};
+        },
+        res(res) {
+            return {};
+        }
+    }
+})
     , morgan = require("morgan")
     , path = require("path")
     , bodyParser = require("body-parser")

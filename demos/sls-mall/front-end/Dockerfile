@@ -2,6 +2,8 @@ FROM node:10-alpine
 ENV NODE_ENV="production" \
     DOMAIN="" \
     OTLP_ENDPOINT=""
+LABEL "app"="frontend"
+LABEL "demo"="sls-mall"
 
 WORKDIR /sls-mall
 COPY . .
