@@ -5,6 +5,9 @@ ENV OTLP_ENDPOINT="" \
     SERVICE_VERSION="1.1.0"
 
 WORKDIR /sls-mall
+LABEL "app"="payment"
+LABEL "demo"="sls-mall"
+LABEL "language"="go"
 
 COPY app .
 RUN chmod +x /sls-mall/app
