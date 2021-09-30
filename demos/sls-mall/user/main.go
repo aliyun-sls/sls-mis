@@ -56,7 +56,7 @@ func main() {
 	// Log domain.
 	var logger log.Logger
 	{
-		logger = log.NewLogfmtLogger(os.Stderr)
+		logger = log.NewJSONLogger(os.Stderr)
 		logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 		logger = log.With(logger, "caller", log.DefaultCaller)
 	}
@@ -86,7 +86,7 @@ func main() {
 
 	dbconn := false
 	for !dbconn {
-		err := db.Init()
+		err := db.Init(logger)
 		if err != nil {
 			if err == db.ErrNoDatabaseSelected {
 				corelog.Fatal(err)

@@ -53,7 +53,7 @@ func MakeLoginEndpoint(s Service) endpoint.Endpoint {
 		span.SetAttributes(label.String("service", "user"))
 		defer span.End()
 		req := request.(loginRequest)
-		u, err := s.Login(req.Username, req.Password)
+		u, err := s.Login(ctx, req.Username, req.Password)
 		return userResponse{User: u}, err
 	}
 }
@@ -65,7 +65,7 @@ func MakeRegisterEndpoint(s Service) endpoint.Endpoint {
 		span.SetAttributes(label.String("service", "user"))
 		defer span.End()
 		req := request.(registerRequest)
-		id, err := s.Register(req.Username, req.Password, req.Email, req.FirstName, req.LastName)
+		id, err := s.Register(ctx, req.Username, req.Password, req.Email, req.FirstName, req.LastName)
 		return postResponse{ID: id}, err
 	}
 }
@@ -79,7 +79,7 @@ func MakeUserGetEndpoint(s Service) endpoint.Endpoint {
 		req := request.(GetRequest)
 
 		_, mongoSpan := otel.Tracer("").Start(newCtx, "users from db")
-		usrs, err := s.GetUsers(req.ID)
+		usrs, err := s.GetUsers(ctx, req.ID)
 		mongoSpan.End()
 		if req.ID == "" {
 			return EmbedStruct{usersResponse{Users: usrs}}, err
@@ -95,7 +95,7 @@ func MakeUserGetEndpoint(s Service) endpoint.Endpoint {
 		}
 		user := usrs[0]
 		_, attributeSpan := otel.Tracer("").Start(newCtx, "attributes from db")
-		db.GetUserAttributes(&user)
+		db.GetUserAttributes(ctx, &user)
 		attributeSpan.End()
 		if req.Attr == "addresses" {
 			return EmbedStruct{addressesResponse{Addresses: user.Addresses}}, err
@@ -114,7 +114,7 @@ func MakeUserPostEndpoint(s Service) endpoint.Endpoint {
 		span.SetAttributes(label.String("service", "user"))
 		defer span.End()
 		req := request.(users.User)
-		id, err := s.PostUser(req)
+		id, err := s.PostUser(ctx, req)
 		return postResponse{ID: id}, err
 	}
 }
@@ -127,7 +127,7 @@ func MakeAddressGetEndpoint(s Service) endpoint.Endpoint {
 		defer getSpan.End()
 		req := request.(GetRequest)
 		_, attributeSpan := otel.Tracer("").Start(newCtx, "addresses from db")
-		adds, err := s.GetAddresses(req.ID)
+		adds, err := s.GetAddresses(ctx, req.ID)
 		attributeSpan.End()
 		if req.ID == "" {
 			return EmbedStruct{addressesResponse{Addresses: adds}}, err
@@ -146,7 +146,7 @@ func MakeAddressPostEndpoint(s Service) endpoint.Endpoint {
 		postSpan.SetAttributes(label.String("service", "user"))
 		defer postSpan.End()
 		req := request.(addressPostRequest)
-		id, err := s.PostAddress(req.Address, req.UserID)
+		id, err := s.PostAddress(ctx, req.Address, req.UserID)
 		return postResponse{ID: id}, err
 	}
 }
@@ -161,7 +161,7 @@ func MakeCardGetEndpoint(s Service) endpoint.Endpoint {
 
 		_, span := otel.Tracer("").Start(newCtx, "addresses from db")
 		span.SetAttributes(label.String("service", "user"))
-		cards, err := s.GetCards(req.ID)
+		cards, err := s.GetCards(ctx, req.ID)
 		span.End()
 		if req.ID == "" {
 			return EmbedStruct{cardsResponse{Cards: cards}}, err
@@ -180,7 +180,7 @@ func MakeCardPostEndpoint(s Service) endpoint.Endpoint {
 		span.SetAttributes(label.String("service", "user"))
 		defer span.End()
 		req := request.(cardPostRequest)
-		id, err := s.PostCard(req.Card, req.UserID)
+		id, err := s.PostCard(ctx, req.Card, req.UserID)
 		return postResponse{ID: id}, err
 	}
 }
@@ -192,7 +192,7 @@ func MakeDeleteEndpoint(s Service) endpoint.Endpoint {
 		span.SetAttributes(label.String("service", "user"))
 		defer span.End()
 		req := request.(deleteRequest)
-		err = s.Delete(req.Entity, req.ID)
+		err = s.Delete(ctx, req.Entity, req.ID)
 		if err == nil {
 			return statusResponse{Status: true}, err
 		}
@@ -212,7 +212,7 @@ func MakeHealthEndpoint(s Service, logger log.Logger) endpoint.Endpoint {
 			}
 		}())
 
-		health := s.Health(log.With(newLogger, "spanId", func() log.Valuer {
+		health := s.Health(ctx, log.With(newLogger, "spanId", func() log.Valuer {
 			return func() interface{} {
 				return span.SpanContext().SpanID
 			}

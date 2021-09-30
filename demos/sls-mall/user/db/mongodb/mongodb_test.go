@@ -105,11 +105,11 @@ func TestCardAddId(t *testing.T) {
 func TestCreate(t *testing.T) {
 	TestMongo.Session = TestServer.Session()
 	defer TestMongo.Session.Close()
-	err := TestMongo.CreateUser(&TestUser)
+	err := TestMongo.CreateUser(nil, &TestUser)
 	if err != nil {
 		t.Error(err)
 	}
-	err = TestMongo.CreateUser(&TestUser)
+	err = TestMongo.CreateUser(nil, &TestUser)
 	if err == nil {
 		t.Error("Expected duplicate key error")
 	}
@@ -118,14 +118,14 @@ func TestCreate(t *testing.T) {
 func TestGetUserByName(t *testing.T) {
 	TestMongo.Session = TestServer.Session()
 	defer TestMongo.Session.Close()
-	u, err := TestMongo.GetUserByName(TestUser.Username)
+	u, err := TestMongo.GetUserByName(nil, TestUser.Username)
 	if err != nil {
 		t.Error(err)
 	}
 	if u.Username != TestUser.Username {
 		t.Error("expected equal usernames")
 	}
-	_, err = TestMongo.GetUserByName("bogususers")
+	_, err = TestMongo.GetUserByName(nil, "bogususers")
 	if err == nil {
 		t.Error("expected not found error")
 	}
@@ -134,7 +134,7 @@ func TestGetUserByName(t *testing.T) {
 func TestGetUser(t *testing.T) {
 	TestMongo.Session = TestServer.Session()
 	defer TestMongo.Session.Close()
-	_, err := TestMongo.GetUser(TestUser.UserID)
+	_, err := TestMongo.GetUser(nil, TestUser.UserID)
 	if err != nil {
 		t.Error(err)
 	}

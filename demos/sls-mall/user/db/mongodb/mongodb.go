@@ -1,6 +1,7 @@
 package mongodb
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -106,7 +107,7 @@ func (m *MongoCard) AddID() {
 }
 
 // CreateUser Insert user to MongoDB, including connected addresses and cards, update passed in user with Ids
-func (m *Mongo) CreateUser(u *users.User) error {
+func (m *Mongo) CreateUser(ctx context.Context, u *users.User) error {
 	s := m.Session.Copy()
 	defer s.Close()
 	id := bson.NewObjectId()
@@ -198,7 +199,7 @@ func (m *Mongo) removeAttributeId(attr string, id bson.ObjectId, userid string) 
 }
 
 // GetUserByName Get user by their name
-func (m *Mongo) GetUserByName(name string) (users.User, error) {
+func (m *Mongo) GetUserByName(ctx context.Context, name string) (users.User, error) {
 	s := m.Session.Copy()
 	defer s.Close()
 	c := s.DB("").C("customers")
@@ -209,7 +210,7 @@ func (m *Mongo) GetUserByName(name string) (users.User, error) {
 }
 
 // GetUser Get user by their object id
-func (m *Mongo) GetUser(id string) (users.User, error) {
+func (m *Mongo) GetUser(ctx context.Context, id string) (users.User, error) {
 	s := m.Session.Copy()
 	defer s.Close()
 	if !bson.IsObjectIdHex(id) {
@@ -223,7 +224,7 @@ func (m *Mongo) GetUser(id string) (users.User, error) {
 }
 
 // GetUsers Get all users
-func (m *Mongo) GetUsers() ([]users.User, error) {
+func (m *Mongo) GetUsers(context.Context) ([]users.User, error) {
 	// TODO: add paginations
 	s := m.Session.Copy()
 	defer s.Close()
@@ -239,7 +240,7 @@ func (m *Mongo) GetUsers() ([]users.User, error) {
 }
 
 // GetUserAttributes given a user, load all cards and addresses connected to that user
-func (m *Mongo) GetUserAttributes(u *users.User) error {
+func (m *Mongo) GetUserAttributes(ctx context.Context, u *users.User) error {
 	s := m.Session.Copy()
 	defer s.Close()
 	ids := make([]bson.ObjectId, 0)
@@ -286,7 +287,7 @@ func (m *Mongo) GetUserAttributes(u *users.User) error {
 }
 
 // GetCard Gets card by objects Id
-func (m *Mongo) GetCard(id string) (users.Card, error) {
+func (m *Mongo) GetCard(ctx context.Context, id string) (users.Card, error) {
 	s := m.Session.Copy()
 	defer s.Close()
 	if !bson.IsObjectIdHex(id) {
@@ -300,7 +301,7 @@ func (m *Mongo) GetCard(id string) (users.Card, error) {
 }
 
 // GetCards Gets all cards
-func (m *Mongo) GetCards() ([]users.Card, error) {
+func (m *Mongo) GetCards(context.Context) ([]users.Card, error) {
 	// TODO: add pagination
 	s := m.Session.Copy()
 	defer s.Close()
@@ -316,7 +317,7 @@ func (m *Mongo) GetCards() ([]users.Card, error) {
 }
 
 // CreateCard adds card to MongoDB
-func (m *Mongo) CreateCard(ca *users.Card, userid string) error {
+func (m *Mongo) CreateCard(ctx context.Context, ca *users.Card, userid string) error {
 	if userid != "" && !bson.IsObjectIdHex(userid) {
 		return errors.New("Invalid Id Hex")
 	}
@@ -342,7 +343,7 @@ func (m *Mongo) CreateCard(ca *users.Card, userid string) error {
 }
 
 // GetAddress Gets an address by object Id
-func (m *Mongo) GetAddress(id string) (users.Address, error) {
+func (m *Mongo) GetAddress(ctx context.Context, id string) (users.Address, error) {
 	s := m.Session.Copy()
 	defer s.Close()
 	if !bson.IsObjectIdHex(id) {
@@ -356,7 +357,7 @@ func (m *Mongo) GetAddress(id string) (users.Address, error) {
 }
 
 // GetAddresses gets all addresses
-func (m *Mongo) GetAddresses() ([]users.Address, error) {
+func (m *Mongo) GetAddresses(context.Context) ([]users.Address, error) {
 	// TODO: add pagination
 	s := m.Session.Copy()
 	defer s.Close()
@@ -372,7 +373,7 @@ func (m *Mongo) GetAddresses() ([]users.Address, error) {
 }
 
 // CreateAddress Inserts Address into MongoDB
-func (m *Mongo) CreateAddress(a *users.Address, userid string) error {
+func (m *Mongo) CreateAddress(ctx context.Context, a *users.Address, userid string) error {
 	if userid != "" && !bson.IsObjectIdHex(userid) {
 		return errors.New("Invalid Id Hex")
 	}
@@ -398,7 +399,7 @@ func (m *Mongo) CreateAddress(a *users.Address, userid string) error {
 }
 
 // CreateAddress Inserts Address into MongoDB
-func (m *Mongo) Delete(entity, id string) error {
+func (m *Mongo) Delete(ctx context.Context, entity string, id string) error {
 	if !bson.IsObjectIdHex(id) {
 		return errors.New("Invalid Id Hex")
 	}
@@ -406,7 +407,7 @@ func (m *Mongo) Delete(entity, id string) error {
 	defer s.Close()
 	c := s.DB("").C(entity)
 	if entity == "customers" {
-		u, err := m.GetUser(id)
+		u, err := m.GetUser(nil, id)
 		if err != nil {
 			return err
 		}

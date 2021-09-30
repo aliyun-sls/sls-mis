@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"errors"
 	"reflect"
 	"testing"
@@ -21,13 +22,13 @@ var (
 )
 
 func TestInit(t *testing.T) {
-	err := Init()
+	err := Init(nil)
 	if err == nil {
 		t.Error("Expected no registered db error")
 	}
 	Register("test", TestDB)
 	database = "test"
-	err = Init()
+	err = Init(nil)
 	if err != ErrFakeError {
 		t.Error("expected fake db error from init")
 	}
@@ -36,13 +37,13 @@ func TestInit(t *testing.T) {
 
 func TestSet(t *testing.T) {
 	database = "nodb"
-	err := Set()
+	err := Set(nil)
 	if err == nil {
 		t.Error("Expecting error for no databade found")
 	}
 	Register("nodb2", TestDB)
 	database = "nodb2"
-	err = Set()
+	err = Set(nil)
 	if err != nil {
 		t.Error(err)
 	}
@@ -62,21 +63,21 @@ func TestRegister(t *testing.T) {
 }
 
 func TestCreateUser(t *testing.T) {
-	err := CreateUser(&users.User{})
+	err := CreateUser(nil, &users.User{})
 	if err != ErrFakeError {
 		t.Error("expected fake db error from create")
 	}
 }
 
 func TestGetUser(t *testing.T) {
-	_, err := GetUser("test")
+	_, err := GetUser(nil, "test")
 	if err != ErrFakeError {
 		t.Error("expected fake db error from get")
 	}
 }
 
 func TestGetUserByName(t *testing.T) {
-	_, err := GetUserByName("test")
+	_, err := GetUserByName(nil, "test")
 	if err != ErrFakeError {
 		t.Error("expected fake db error from get")
 	}
@@ -84,7 +85,7 @@ func TestGetUserByName(t *testing.T) {
 
 func TestGetUserAttributes(t *testing.T) {
 	u := users.New()
-	GetUserAttributes(&u)
+	GetUserAttributes(nil, &u)
 	if len(u.Addresses) != 1 {
 		t.Error("expected one address added for GetUserAttributes")
 	}
@@ -106,51 +107,51 @@ type fake struct{}
 func (f fake) Init() error {
 	return ErrFakeError
 }
-func (f fake) GetUserByName(name string) (users.User, error) {
+func (f fake) GetUserByName(ctx context.Context, name string) (users.User, error) {
 	return users.User{}, ErrFakeError
 }
-func (f fake) GetUser(id string) (users.User, error) {
+func (f fake) GetUser(ctx context.Context, id string) (users.User, error) {
 	return users.User{}, ErrFakeError
 }
 
-func (f fake) GetUsers() ([]users.User, error) {
+func (f fake) GetUsers(context.Context) ([]users.User, error) {
 	return make([]users.User, 0), ErrFakeError
 }
 
-func (f fake) CreateUser(*users.User) error {
+func (f fake) CreateUser(context.Context, *users.User) error {
 	return ErrFakeError
 }
 
-func (f fake) GetUserAttributes(u *users.User) error {
+func (f fake) GetUserAttributes(ctx context.Context, u *users.User) error {
 	u.Addresses = append(u.Addresses, TestAddress)
 	return nil
 }
 
-func (f fake) GetCard(id string) (users.Card, error) {
+func (f fake) GetCard(ctx context.Context, id string) (users.Card, error) {
 	return users.Card{}, ErrFakeError
 }
 
-func (f fake) GetCards() ([]users.Card, error) {
+func (f fake) GetCards(context.Context) ([]users.Card, error) {
 	return make([]users.Card, 0), ErrFakeError
 }
 
-func (f fake) CreateCard(c *users.Card, id string) error {
+func (f fake) CreateCard(ctx context.Context, c *users.Card, id string) error {
 	return ErrFakeError
 }
 
-func (f fake) GetAddress(id string) (users.Address, error) {
+func (f fake) GetAddress(ctx context.Context, id string) (users.Address, error) {
 	return users.Address{}, ErrFakeError
 }
 
-func (f fake) GetAddresses() ([]users.Address, error) {
+func (f fake) GetAddresses(context.Context) ([]users.Address, error) {
 	return make([]users.Address, 0), ErrFakeError
 }
 
-func (f fake) CreateAddress(u *users.Address, id string) error {
+func (f fake) CreateAddress(ctx context.Context, u *users.Address, id string) error {
 	return ErrFakeError
 }
 
-func (f fake) Delete(entity, id string) error {
+func (f fake) Delete(ctx context.Context, entity string, id string) error {
 	return ErrFakeError
 }
 

@@ -1,6 +1,9 @@
 package api
 
 import (
+	"context"
+	"fmt"
+	"go.opentelemetry.io/otel/trace"
 	"time"
 
 	"github.com/go-kit/kit/log"
@@ -25,42 +28,50 @@ type loggingMiddleware struct {
 	logger log.Logger
 }
 
-func (mw loggingMiddleware) Login(username, password string) (user users.User, err error) {
+func (mw loggingMiddleware) Login(ctx context.Context, username, password string) (user users.User, err error) {
+	spanContext := trace.SpanContextFromContext(ctx)
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"method", "Login",
-			"took", time.Since(begin),
+			"took", time.Since(begin).Microseconds(),
+			"traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String(),
+			"cust_name", username,
 		)
 	}(time.Now())
-	return mw.next.Login(username, password)
+	return mw.next.Login(nil, username, password)
 }
 
-func (mw loggingMiddleware) Register(username, password, email, first, last string) (string, error) {
+func (mw loggingMiddleware) Register(ctx context.Context, username, password, email, first, last string) (string, error) {
+	spanContext := trace.SpanContextFromContext(ctx)
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"method", "Register",
-			"username", username,
-			"email", email,
-			"took", time.Since(begin),
+			"message", fmt.Sprintf("RegisterInfo: username: %s, email: %s", username, email),
+			"traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String(),
+			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.Register(username, password, email, first, last)
+	return mw.next.Register(nil, username, password, email, first, last)
 }
 
-func (mw loggingMiddleware) PostUser(user users.User) (id string, err error) {
+func (mw loggingMiddleware) PostUser(ctx context.Context, user users.User) (id string, err error) {
+	spanContext := trace.SpanContextFromContext(ctx)
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"method", "PostUser",
-			"username", user.Username,
-			"email", user.Email,
-			"result", id,
-			"took", time.Since(begin),
+			"message", fmt.Sprintf("PostUser: username: %s, email: %s userid: %s", user.Username, user.Email, id),
+			"traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String(),
+			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.PostUser(user)
+	return mw.next.PostUser(nil, user)
 }
 
-func (mw loggingMiddleware) GetUsers(id string) (u []users.User, err error) {
+func (mw loggingMiddleware) GetUsers(ctx context.Context, id string) (u []users.User, err error) {
+	spanContext := trace.SpanContextFromContext(ctx)
 	defer func(begin time.Time) {
 		who := id
 		if who == "" {
@@ -68,28 +79,31 @@ func (mw loggingMiddleware) GetUsers(id string) (u []users.User, err error) {
 		}
 		mw.logger.Log(
 			"method", "GetUsers",
-			"id", who,
-			"result", len(u),
-			"took", time.Since(begin),
+			"message", fmt.Sprintf("GetUsers: userid: %s, size of user: %d", who, len(u)),
+			"traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String(),
+			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.GetUsers(id)
+	return mw.next.GetUsers(nil, id)
 }
 
-func (mw loggingMiddleware) PostAddress(add users.Address, id string) (string, error) {
+func (mw loggingMiddleware) PostAddress(ctx context.Context, add users.Address, id string) (string, error) {
+	spanContext := trace.SpanContextFromContext(ctx)
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"method", "PostAddress",
-			"street", add.Street,
-			"number", add.Number,
-			"user", id,
-			"took", time.Since(begin),
+			"message", fmt.Sprintf("PostAddress: userid: %s, street: %s, number: %s", id, add.Street, add.Number),
+			"traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String(),
+			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.PostAddress(add, id)
+	return mw.next.PostAddress(nil, add, id)
 }
 
-func (mw loggingMiddleware) GetAddresses(id string) (a []users.Address, err error) {
+func (mw loggingMiddleware) GetAddresses(ctx context.Context, id string) (a []users.Address, err error) {
+	spanContext := trace.SpanContextFromContext(ctx)
 	defer func(begin time.Time) {
 		who := id
 		if who == "" {
@@ -98,28 +112,33 @@ func (mw loggingMiddleware) GetAddresses(id string) (a []users.Address, err erro
 		mw.logger.Log(
 			"method", "GetAddresses",
 			"id", who,
-			"result", len(a),
-			"took", time.Since(begin),
+			"message", fmt.Sprintf("GetUsers: userid: %s, size of user: %d", who, len(a)),
+			"traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String(),
+			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.GetAddresses(id)
+	return mw.next.GetAddresses(nil, id)
 }
 
-func (mw loggingMiddleware) PostCard(card users.Card, id string) (string, error) {
+func (mw loggingMiddleware) PostCard(ctx context.Context, card users.Card, id string) (string, error) {
+	spanContext := trace.SpanContextFromContext(ctx)
 	defer func(begin time.Time) {
 		cc := card
 		cc.MaskCC()
 		mw.logger.Log(
 			"method", "PostCard",
-			"card", cc.LongNum,
-			"user", id,
-			"took", time.Since(begin),
+			"message", fmt.Sprintf("PostCard: userid: %s, card: %d", id, cc.LongNum),
+			"traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String(),
+			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.PostCard(card, id)
+	return mw.next.PostCard(nil, card, id)
 }
 
-func (mw loggingMiddleware) GetCards(id string) (a []users.Card, err error) {
+func (mw loggingMiddleware) GetCards(ctx context.Context, id string) (a []users.Card, err error) {
+	spanContext := trace.SpanContextFromContext(ctx)
 	defer func(begin time.Time) {
 		who := id
 		if who == "" {
@@ -127,33 +146,41 @@ func (mw loggingMiddleware) GetCards(id string) (a []users.Card, err error) {
 		}
 		mw.logger.Log(
 			"method", "GetCards",
-			"id", who,
-			"result", len(a),
-			"took", time.Since(begin),
+			"message", fmt.Sprintf("GetCards: userid: %s, size of user: %d", who, len(a)),
+			"traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String(),
+			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.GetCards(id)
+	return mw.next.GetCards(nil, id)
 }
 
-func (mw loggingMiddleware) Delete(entity, id string) (err error) {
+func (mw loggingMiddleware) Delete(ctx context.Context, entity, id string) (err error) {
+	spanContext := trace.SpanContextFromContext(ctx)
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"method", "Delete",
 			"entity", entity,
 			"id", id,
-			"took", time.Since(begin),
+			"message", fmt.Sprintf("Delete: userid: %s", id),
+			"traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String(),
+			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.Delete(entity, id)
+	return mw.next.Delete(nil, entity, id)
 }
 
-func (mw loggingMiddleware) Health(logger log.Logger) (health []Health) {
+func (mw loggingMiddleware) Health(ctx context.Context, logger log.Logger) (health []Health) {
+	spanContext := trace.SpanContextFromContext(ctx)
 	defer func(begin time.Time) {
 		mw.logger.Log(
 			"method", "Health",
-			"result", len(health),
-			"took", time.Since(begin),
+			"message", len(health),
+			"traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String(),
+			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.Health(logger)
+	return mw.next.Health(nil, logger)
 }

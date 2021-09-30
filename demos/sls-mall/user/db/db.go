@@ -1,9 +1,11 @@
 package db
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/go-kit/kit/log"
 	"os"
 
 	"github.com/sls-mis/demos/sls-mall/user/users"
@@ -13,18 +15,18 @@ import (
 // this is just basic and specific to this microservice
 type Database interface {
 	Init() error
-	GetUserByName(string) (users.User, error)
-	GetUser(string) (users.User, error)
-	GetUsers() ([]users.User, error)
-	CreateUser(*users.User) error
-	GetUserAttributes(*users.User) error
-	GetAddress(string) (users.Address, error)
-	GetAddresses() ([]users.Address, error)
-	CreateAddress(*users.Address, string) error
-	GetCard(string) (users.Card, error)
-	GetCards() ([]users.Card, error)
-	Delete(string, string) error
-	CreateCard(*users.Card, string) error
+	GetUserByName(context.Context, string) (users.User, error)
+	GetUser(context.Context, string) (users.User, error)
+	GetUsers(context.Context) ([]users.User, error)
+	CreateUser(context.Context, *users.User) error
+	GetUserAttributes(context.Context, *users.User) error
+	GetAddress(context.Context, string) (users.Address, error)
+	GetAddresses(context.Context) ([]users.Address, error)
+	CreateAddress(context.Context, *users.Address, string) error
+	GetCard(context.Context, string) (users.Card, error)
+	GetCards(context.Context) ([]users.Card, error)
+	Delete(context.Context, string, string) error
+	CreateCard(context.Context, *users.Card, string) error
 	Ping() error
 }
 
@@ -46,11 +48,11 @@ func init() {
 }
 
 //Init inits the selected DB in DefaultDb
-func Init() error {
+func Init(log log.Logger) error {
 	if database == "" {
 		return ErrNoDatabaseSelected
 	}
-	err := Set()
+	err := Set(log)
 	if err != nil {
 		return err
 	}
@@ -58,7 +60,7 @@ func Init() error {
 }
 
 //Set the DefaultDb
-func Set() error {
+func Set(logger log.Logger) error {
 	if v, ok := DBTypes[database]; ok {
 		DefaultDb = v
 		return nil
@@ -72,13 +74,13 @@ func Register(name string, db Database) {
 }
 
 //CreateUser invokes DefaultDb method
-func CreateUser(u *users.User) error {
-	return DefaultDb.CreateUser(u)
+func CreateUser(ctx context.Context, u *users.User) error {
+	return DefaultDb.CreateUser(ctx, u)
 }
 
 //GetUserByName invokes DefaultDb method
-func GetUserByName(n string) (users.User, error) {
-	u, err := DefaultDb.GetUserByName(n)
+func GetUserByName(ctx context.Context, n string) (users.User, error) {
+	u, err := DefaultDb.GetUserByName(ctx, n)
 	if err == nil {
 		u.AddLinks()
 	}
@@ -86,8 +88,8 @@ func GetUserByName(n string) (users.User, error) {
 }
 
 //GetUser invokes DefaultDb method
-func GetUser(n string) (users.User, error) {
-	u, err := DefaultDb.GetUser(n)
+func GetUser(ctx context.Context, n string) (users.User, error) {
+	u, err := DefaultDb.GetUser(ctx, n)
 	if err == nil {
 		u.AddLinks()
 	}
@@ -95,8 +97,8 @@ func GetUser(n string) (users.User, error) {
 }
 
 //GetUsers invokes DefaultDb method
-func GetUsers() ([]users.User, error) {
-	us, err := DefaultDb.GetUsers()
+func GetUsers(ctx context.Context) ([]users.User, error) {
+	us, err := DefaultDb.GetUsers(ctx)
 	for k, _ := range us {
 		us[k].AddLinks()
 	}
@@ -104,8 +106,8 @@ func GetUsers() ([]users.User, error) {
 }
 
 //GetUserAttributes invokes DefaultDb method
-func GetUserAttributes(u *users.User) error {
-	err := DefaultDb.GetUserAttributes(u)
+func GetUserAttributes(ctx context.Context, u *users.User) error {
+	err := DefaultDb.GetUserAttributes(ctx, u)
 	if err != nil {
 		return err
 	}
@@ -119,13 +121,13 @@ func GetUserAttributes(u *users.User) error {
 }
 
 //CreateAddress invokes DefaultDb method
-func CreateAddress(a *users.Address, userid string) error {
-	return DefaultDb.CreateAddress(a, userid)
+func CreateAddress(ctx context.Context, a *users.Address, userid string) error {
+	return DefaultDb.CreateAddress(ctx, a, userid)
 }
 
 //GetAddress invokes DefaultDb method
-func GetAddress(n string) (users.Address, error) {
-	a, err := DefaultDb.GetAddress(n)
+func GetAddress(ctx context.Context, n string) (users.Address, error) {
+	a, err := DefaultDb.GetAddress(ctx, n)
 	if err == nil {
 		a.AddLinks()
 	}
@@ -133,8 +135,8 @@ func GetAddress(n string) (users.Address, error) {
 }
 
 //GetAddresses invokes DefaultDb method
-func GetAddresses() ([]users.Address, error) {
-	as, err := DefaultDb.GetAddresses()
+func GetAddresses(ctx context.Context) ([]users.Address, error) {
+	as, err := DefaultDb.GetAddresses(ctx)
 	for k, _ := range as {
 		as[k].AddLinks()
 	}
@@ -142,18 +144,18 @@ func GetAddresses() ([]users.Address, error) {
 }
 
 //CreateCard invokes DefaultDb method
-func CreateCard(c *users.Card, userid string) error {
-	return DefaultDb.CreateCard(c, userid)
+func CreateCard(ctx context.Context, c *users.Card, userid string) error {
+	return DefaultDb.CreateCard(ctx, c, userid)
 }
 
 //GetCard invokes DefaultDb method
-func GetCard(n string) (users.Card, error) {
-	return DefaultDb.GetCard(n)
+func GetCard(ctx context.Context, n string) (users.Card, error) {
+	return DefaultDb.GetCard(ctx, n)
 }
 
 //GetCards invokes DefaultDb method
-func GetCards() ([]users.Card, error) {
-	cs, err := DefaultDb.GetCards()
+func GetCards(ctx context.Context) ([]users.Card, error) {
+	cs, err := DefaultDb.GetCards(ctx)
 	for k, _ := range cs {
 		cs[k].AddLinks()
 	}
@@ -161,8 +163,8 @@ func GetCards() ([]users.Card, error) {
 }
 
 //Delete invokes DefaultDb method
-func Delete(entity, id string) error {
-	return DefaultDb.Delete(entity, id)
+func Delete(ctx context.Context, entity, id string) error {
+	return DefaultDb.Delete(ctx, entity, id)
 }
 
 //Ping invokes DefaultDB method
