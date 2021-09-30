@@ -61,7 +61,6 @@
             if (error) {
                 return next(error);
             }
-            console.log('User cart deleted with status: ' + response.statusCode);
             if (span) {
                 helpers.respondStatus(res, response.statusCode, {'trace-id': span.spanContext().traceId});
             } else {
@@ -109,7 +108,6 @@
                     helpers.respondStatus(res, response.statusCode)
                 }
             }
-            console.log('Item deleted with status: ' + response.statusCode);
             if (span) {
                 helpers.respondStatus(res, response.statusCode, {'trace-id': span.spanContext().traceId});
             } else {
@@ -229,7 +227,6 @@
                     json: true,
                     body: {itemId: item.id, quantity: parseInt(req.body.quantity), unitPrice: item.price}
                 };
-                console.log("PATCH to carts: " + options.uri + " body: " + JSON.stringify(options.body));
                 let startTime = Math.floor(Date.now() / 1000);
                 request(options, function (error, response, body) {
 

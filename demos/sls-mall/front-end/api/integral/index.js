@@ -9,7 +9,6 @@
         , app = express();
 
     app.get("/integral", function (req, res, next) {
-        console.log("integral Request received with body: " + JSON.stringify(req.body));
         var logged_in = req.cookies.logged_in;
         if (!logged_in) {
             req.log.warn("用户没有登陆")
@@ -35,9 +34,7 @@
                         if (error) {
                             return callback(error);
                         }
-                        console.log("Received response: " + JSON.stringify(body));
                         if (response.statusCode == 404) {
-                            console.log("No integral found for user: " + custId);
                             return callback(null, []);
                         }
                         callback(null, JSON.parse(body));

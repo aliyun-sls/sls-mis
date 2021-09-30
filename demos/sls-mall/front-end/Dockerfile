@@ -4,6 +4,7 @@ ENV NODE_ENV="production" \
     OTLP_ENDPOINT=""
 LABEL "app"="frontend"
 LABEL "demo"="sls-mall"
+LABEL "language"="nodejs"
 
 WORKDIR /sls-mall
 COPY . .

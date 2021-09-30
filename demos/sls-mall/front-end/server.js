@@ -42,7 +42,7 @@ if (process.env.SESSION_REDIS) {
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(helpers.sessionMiddleware);
-app.use(morgan("dev", {}));
+//app.use(morgan("dev", {}));
 
 var domain = "";
 process.argv.forEach(function (val, index, array) {

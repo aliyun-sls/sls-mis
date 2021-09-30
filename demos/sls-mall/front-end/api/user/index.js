@@ -102,7 +102,6 @@
             body: req.body
         };
 
-        console.log("Posting Customer: " + JSON.stringify(req.body));
         var span = trace.getSpan(context.active());
         let startTime = Math.floor(Date.now() / 1000);
         request(options, function (error, response, body) {
@@ -141,7 +140,6 @@
             json: true,
             body: req.body
         };
-        console.log("Posting Address: " + JSON.stringify(req.body));
         let span = trace.getSpan(context.active());
         let startTime = Math.floor(Date.now() / 1000);
         request(options, function (error, response, body) {
@@ -268,7 +266,6 @@
             json: true,
             body: req.body
         };
-        console.log("Posting Card: " + JSON.stringify(req.body));
         let startTime = Math.floor(Date.now() / 1000);
         var span = trace.getSpan(context.active());
         request(options, function (error, response, body) {
@@ -431,21 +428,16 @@
                                 callback(body.error);
                                 return;
                             }
-                            console.log(body);
                             var customerId = body.id;
-                            console.log(customerId);
                             req.session.customerId = customerId;
                             callback(null, customerId);
                             return;
                         }
-                        console.log(response.statusCode);
                         callback(true);
                     });
                 },
                 function (custId, callback) {
                     var sessionId = req.session.id;
-                    console.log("Merging carts for customer id: " + custId + " and session id: " + sessionId);
-
                     var options = {
                         uri: endpoints.cartsUrl + "/" + custId + "/merge" + "?sessionId=" + sessionId,
                         method: 'GET'
@@ -464,19 +456,16 @@
                             if (callback) callback(error);
                             return;
                         }
-                        console.log('Carts merged.');
                         if (callback) callback(null, custId);
                     });
                 }
             ],
             function (err, custId) {
                 if (err) {
-                    console.log("Error with log in: " + err);
                     res.status(500);
                     res.end();
                     return;
                 }
-                console.log("set cookie" + custId);
                 res.status(200);
                 if (span) {
                     res.header('trace-id', span.spanContext().traceId)
@@ -484,7 +473,6 @@
                 res.cookie(cookie_name, req.session.id, {
                     maxAge: 3600000
                 }).send({id: custId});
-                console.log("Sent cookies.");
                 res.end();
                 return;
             }
@@ -520,21 +508,16 @@
                             return;
                         }
                         if (response.statusCode == 200 && body != null && body != "") {
-                            console.log(body);
                             var customerId = JSON.parse(body).user.id;
-                            console.log(customerId);
                             req.session.customerId = customerId;
                             callback(null, customerId);
                             return;
                         }
-                        console.log(response.statusCode);
                         callback(true);
                     });
                 },
                 function (custId, callback) {
                     var sessionId = req.session.id;
-                    console.log("Merging carts for customer id: " + custId + " and session id: " + sessionId);
-
                     var options = {
                         uri: endpoints.cartsUrl + "/" + custId + "/merge" + "?sessionId=" + sessionId,
                         method: 'GET'
@@ -550,17 +533,14 @@
                         })
                         if (error) {
                             // if cart fails just log it, it prevenst login
-                            console.log(error);
                             //return;
                         }
-                        console.log('Carts merged.');
                         callback(null, custId);
                     });
                 }
             ],
             function (err, custId) {
                 if (err) {
-                    console.log("Error with log in: " + err);
                     res.status(401);
                     res.end();
                     return;
@@ -572,7 +552,6 @@
                 res.cookie(cookie_name, req.session.id, {
                     maxAge: 3600000
                 }).send('Cookie is set');
-                console.log("Sent cookies.");
                 res.end();
                 return;
             });

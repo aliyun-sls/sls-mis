@@ -36,9 +36,7 @@
             if (error) {
               return callback(error);
             }
-            console.log("Received response: " + JSON.stringify(body));
             if (response.statusCode == 404) {
-              console.log("No orders found for user: " + custId);
               return callback(null, []);
             }
             callback(null, JSON.parse(body)._embedded.customerOrders);
@@ -63,7 +61,6 @@
   });
 
   app.post("/orders", function(req, res, next) {
-    console.log("Request received with body: " + JSON.stringify(req.body));
     var logged_in = req.cookies.logged_in;
     if (!logged_in) {
       req.log.warn("用户没有登陆")
@@ -91,7 +88,6 @@
               callback(error);
               return;
             }
-            console.log("Received response: " + JSON.stringify(body));
             var jsonBody = JSON.parse(body);
             var customerlink = jsonBody._links.customer.href;
             var addressLink = jsonBody._links.addresses.href;
@@ -108,7 +104,6 @@
         function (order, addressLink, cardLink, callback) {
           async.parallel([
               function (callback) {
-                console.log("GET Request to: " + addressLink);
                 let startTime = Math.floor(Date.now() / 1000);
                 request.get(addressLink, function (error, response, body) {
                   childLogging.info({
@@ -123,7 +118,6 @@
                     callback(error);
                     return;
                   }
-                  console.log("Received response: " + JSON.stringify(body));
                   var jsonBody = JSON.parse(body);
                   if (jsonBody.status_code !== 500 && jsonBody._embedded.address[0] != null) {
                     order.address = jsonBody._embedded.address[0]._links.self.href;
@@ -146,7 +140,6 @@
                     callback(error);
                     return;
                   }
-                  console.log("Received response: " + JSON.stringify(body));
                   var jsonBody = JSON.parse(body);
                   if (jsonBody.status_code !== 500 && jsonBody._embedded.card[0] != null) {
                     order.card = jsonBody._embedded.card[0]._links.self.href;
@@ -159,7 +152,6 @@
               callback(err);
               return;
             }
-            console.log(result);
             callback(null, order);
           });
         },
@@ -184,8 +176,6 @@
             if (error) {
               return callback(error);
             }
-            console.log("Order response: " + JSON.stringify(response));
-            console.log("Order response: " + JSON.stringify(body));
             callback(null, response.statusCode, body);
           });
         }
