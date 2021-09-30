@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
-
-	"go.opentelemetry.io/otel/trace"
 )
 
 // Middleware decorates a service.
@@ -69,11 +67,6 @@ func (s *service) Authorise(ctx context.Context, amount float32) (Authorisation,
 	err := deductFromCart(amount)
 	if err != nil {
 		authorised = false
-		spanContext := trace.SpanContextFromContext(ctx)
-		globalLogger.Log("error", err.Error(),
-			"Authorised", authorised,
-			"traceId", spanContext.TraceID.String(),
-			"spanId", spanContext.SpanID.String())
 	}
 
 	return Authorisation{

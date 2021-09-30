@@ -21,7 +21,7 @@ import (
 func MakeHTTPHandler(ctx context.Context, e Endpoints, logger log.Logger) *mux.Router {
 	r := mux.NewRouter().StrictSlash(false)
 	options := []httptransport.ServerOption{
-		httptransport.ServerErrorLogger(logger),
+		//httptransport.ServerErrorLogger(logger),
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 
