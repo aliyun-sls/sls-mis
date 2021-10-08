@@ -41,8 +41,8 @@ type service struct {
 }
 
 func deductFromCart(amount float32) error {
-	if rand.Int()%10 == 0 {
-		time.Sleep(time.Second)
+	if rand.Int()%5 == 0 {
+		time.Sleep(6 * time.Second)
 		return errors.New("Deduct money from your bank card timeout")
 	}
 	return nil

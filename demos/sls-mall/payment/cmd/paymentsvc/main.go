@@ -99,7 +99,7 @@ func main() {
 	{
 		// Log domain.
 		{
-			logger = log.NewLogfmtLogger(os.Stderr)
+			logger = log.NewJSONLogger(os.Stderr)
 			logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 			logger = log.With(logger, "caller", log.DefaultCaller)
 		}
