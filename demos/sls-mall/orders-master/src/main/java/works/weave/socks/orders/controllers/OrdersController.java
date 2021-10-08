@@ -1,5 +1,6 @@
 package works.weave.socks.orders.controllers;
 
+import io.opentelemetry.api.trace.Span;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,7 @@ public class OrdersController {
                     ParameterizedTypeReference<List<Item>>() {
                     });
 
+
             float amount = calculateTotal(itemsFuture.get(timeout, TimeUnit.SECONDS));
             // Call payment service to make sure they've paid
             PaymentRequest paymentRequest = new PaymentRequest(
@@ -90,6 +92,7 @@ public class OrdersController {
                     amount);
 
             CustomerOrder savedOrder = customerOrderRepository.save(order);
+            Span.current().setAttribute("orderId", savedOrder.getId());
             LOG.info("创建订单：创建订单成功: 客户ID: {}, 订单ID: {}", customerId, savedOrder.getId());
 
             if (ThreadLocalRandom.current().nextInt(1000) < 10) {
