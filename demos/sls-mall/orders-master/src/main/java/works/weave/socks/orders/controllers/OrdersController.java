@@ -104,19 +104,26 @@ public class OrdersController {
                     paymentRequest,
                     new ParameterizedTypeReference<PaymentResponse>() {
                     });
-            PaymentResponse paymentResponse = paymentFuture.get(timeout, TimeUnit.SECONDS);
-            if (paymentResponse == null) {
+            try {
+                PaymentResponse paymentResponse = paymentFuture.get(timeout, TimeUnit.SECONDS);
+                if (!paymentResponse.isAuthorised()) {
+                    savedOrder.setStatus("Payment failure");
+                    customerOrderRepository.save(savedOrder);
+                    LOG.info("创建订单：订单ID: {} 调用[payment]后台服务-调用支付接口鉴权失败. 失败原因：{}", savedOrder.getId(), paymentResponse.getMessage());
+                    throw new PaymentDeclinedException(paymentResponse.getMessage());
+                }
+            } catch (TimeoutException e) {
                 savedOrder.setStatus("Payment failure");
                 customerOrderRepository.save(savedOrder);
                 LOG.info("创建订单：订单ID: {} 调用[payment]后台服务-调用支付接口超时.", savedOrder.getId());
                 throw new PaymentDeclinedException("Unable to parse authorisation packet");
-            }
-            if (!paymentResponse.isAuthorised()) {
+            } catch (Exception e) {
                 savedOrder.setStatus("Payment failure");
                 customerOrderRepository.save(savedOrder);
-                LOG.info("创建订单：订单ID: {} 调用[payment]后台服务-调用支付接口鉴权失败. 失败原因：{}", savedOrder.getId(), paymentResponse.getMessage());
-                throw new PaymentDeclinedException(paymentResponse.getMessage());
+                LOG.info("创建订单：订单ID: {} 调用[payment]后台服务-调用支付接口出错.", savedOrder.getId());
+                throw new PaymentDeclinedException("Payment error");
             }
+
             savedOrder.setStatus("payed");
             customerOrderRepository.save(savedOrder);
             LOG.info("创建订单：调用[payment]后台服务-调用支付接口成功.");
