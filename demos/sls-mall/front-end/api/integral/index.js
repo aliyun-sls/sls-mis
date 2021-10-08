@@ -8,6 +8,8 @@
         , helpers = require("../../helpers")
         , app = express();
 
+    const {context, getSpan, trace} = require('@opentelemetry/api');
+
     app.get("/integral", function (req, res, next) {
         var logged_in = req.cookies.logged_in;
         if (!logged_in) {
@@ -19,6 +21,8 @@
         var custId = req.session.customerId;
         let childLogging = req.log.child({"cust_id": custId, 'operation': 'GetUserPoint'});
         childLogging.info({parameters: req.params, msg: '查看用户积分', url: req.url});
+        var span = trace.getSpan(context.active());
+        span.setAttribute("用户ID", custId);
         async.waterfall([
                 function (callback) {
                     let startTime = Math.floor(Date.now() / 1000);
@@ -59,7 +63,8 @@
         var custId = req.session.customerId;
         let childLogging = req.log.child({"cust_id": custId, 'operation': 'GetAllUserPoints'});
         childLogging.info({parameters: req.params, msg: '查看用户积分明细', url: req.url});
-
+        var span = trace.getSpan(context.active());
+        span.setAttribute("用户ID", custId);
         async.waterfall([
                 function (callback) {
                     let startTime = Math.floor(Date.now() / 1000);

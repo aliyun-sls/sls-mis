@@ -21,6 +21,7 @@
     let childLogging = req.log.child({"cust_id": custId, 'operation': 'GetOrders'});
     childLogging.info({parameters: req.params, msg: '查看用户订单信息', url: req.url});
     var span = trace.getSpan(context.active());
+    span.setAttribute("用户ID", custId);
     async.waterfall([
         function (callback) {
           let startTime = Math.floor(Date.now() / 1000);
@@ -72,6 +73,7 @@
     let childLogging = req.log.child({"cust_id": custId, 'operation': 'CreateOrder'});
     childLogging.info({parameters: req.params, msg: '查看用户订单信息', url: req.url});
     var span = trace.getSpan(context.active());
+    span.setAttribute("用户ID", custId);
     async.waterfall([
         function (callback) {
           let startTime = Math.floor(Date.now() / 1000);

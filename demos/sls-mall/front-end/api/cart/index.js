@@ -15,6 +15,7 @@
         let childLogging = req.log.child({"cust_id": custId, 'operation': 'ListCart'});
         childLogging.info({parameters: req.params, msg: '查看购物车请求', url: req.url});
         var span = trace.getSpan(context.active());
+        span.setAttribute("用户ID", custId);
         const startTime = Math.floor(Date.now() / 1000);
         request(endpoints.cartsUrl + "/" + custId + "/items", function (error, response, body) {
             childLogging.info({
@@ -46,7 +47,7 @@
             method: 'DELETE'
         };
         var span = trace.getSpan(context.active());
-
+        span.setAttribute("用户ID", custId);
         const startTime = Math.floor(Date.now() / 1000);
         request(options, function (error, response, body) {
             childLogging.info({
@@ -91,6 +92,7 @@
 
         const startTime = Math.floor(Date.now() / 1000);
         var span = trace.getSpan(context.active());
+        span.setAttribute("用户ID", custId);
         request(options, function (error, response, body) {
             childLogging.info({
                 msg: '请求[Carts]后端删除购物车产品服务',
@@ -128,7 +130,7 @@
 
 
         var span = trace.getSpan(context.active());
-
+        span.setAttribute("用户ID", custId);
         let startTime = Math.floor(Date.now() / 1000);
         async.waterfall([
             function (callback) {
@@ -204,7 +206,7 @@
         });
 
         var span = trace.getSpan(context.active());
-
+        span.setAttribute("用户ID", custId);
         async.waterfall([
             function (callback) {
                 let startTime = Math.floor(Date.now() / 1000);

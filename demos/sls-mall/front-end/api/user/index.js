@@ -12,6 +12,10 @@
         let childLogging = req.log.child({"cust_id": custId, 'operation': 'GetUserInfo'});
         childLogging.info({parameters: req.params, msg: '查看用户信息', url: req.url});
         let startTime = Math.floor(Date.now() / 1000);
+
+        var span = trace.getSpan(context.active());
+        span.setAttribute("用户ID", custId);
+
         helpers.simpleHttpRequest(endpoints.customersUrl + "/" + req.session.customerId, res, next, function (error, response, body) {
             childLogging.info({
                 msg: "调用[user]：查看用户详情",
@@ -28,6 +32,9 @@
         let childLogging = req.log.child({"cust_id": custId, 'operation': 'GetUserCardInfo'});
         childLogging.info({parameters: req.params, msg: '查看用户银行卡信息', url: req.url});
         let startTime = Math.floor(Date.now() / 1000);
+
+        var span = trace.getSpan(context.active());
+        span.setAttribute("用户ID", custId);
 
         helpers.simpleHttpRequest(endpoints.cardsUrl + "/" + req.params.id, res, next, function (error, response, body) {
             childLogging.info({
@@ -175,6 +182,7 @@
             method: 'GET',
         };
         var span = trace.getSpan(context.active());
+        span.setAttribute("用户ID", custId);
         let startTime = Math.floor(Date.now() / 1000);
         request(options, function (error, response, body) {
             childLogging.info({
@@ -220,6 +228,7 @@
             method: 'GET',
         };
         var span = trace.getSpan(context.active());
+        span.setAttribute("用户ID", custId);
         let startTime = Math.floor(Date.now() / 1000);
         request(options, function (error, response, body) {
             childLogging.info({
@@ -268,6 +277,7 @@
         };
         let startTime = Math.floor(Date.now() / 1000);
         var span = trace.getSpan(context.active());
+        span.setAttribute("用户ID", custId);
         request(options, function (error, response, body) {
             childLogging.info({
                 msg: "调用[user]：添加用户银行卡信息",
@@ -302,6 +312,7 @@
             method: 'DELETE'
         };
         var span = trace.getSpan(context.active());
+        span.setAttribute("用户ID", custId);
         let startTime = Math.floor(Date.now() / 1000);
         request(options, function (error, response, body) {
             childLogging.info({
@@ -336,6 +347,7 @@
             method: 'DELETE'
         };
         var span = trace.getSpan(context.active());
+        span.setAttribute("用户ID", custId);
         let startTime = Math.floor(Date.now() / 1000);
         request(options, function (error, response, body) {
             childLogging.info({
