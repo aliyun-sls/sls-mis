@@ -198,7 +198,7 @@ func (s *catalogueService) Tags(ctx context.Context) ([]string, error) {
 	query := "call selectTags(?);"
 
 	s.logger.Log("content", "查询产品标签", "Operation", "ListTags", "sql", query, "traceId", spanContext.TraceID.String(),
-		"spanId", spanContext.SpanID.String())
+		"spanId", spanContext.SpanID.String(), "version", "1.2.0")
 
 	rows, err := s.db.Query(query, "1.2.0")
 	if err != nil {
