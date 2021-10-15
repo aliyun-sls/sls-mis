@@ -207,8 +207,9 @@ func (s *catalogueService) Tags(ctx context.Context) ([]string, error) {
 		return []string{}, ErrDBConnection
 	}
 	for rows.Next() {
+		var id int
 		var tag string
-		err = rows.Scan(&tag)
+		err = rows.Scan(&id, &tag)
 		if err != nil {
 			s.logger.Log("content", "查询产品标签失败", "Operation", "ListTags", "error", err, "traceId", spanContext.TraceID.String(),
 				"spanId", spanContext.SpanID.String())
