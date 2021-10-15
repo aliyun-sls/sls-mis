@@ -85,7 +85,7 @@ func TestCatalogueServiceList(t *testing.T) {
 			want:     []Sock{s5},
 		},
 	} {
-		have, err := s.List(testcase.tags, testcase.order, testcase.pageNum, testcase.pageSize)
+		have, err := s.List(nil, testcase.tags, testcase.order, testcase.pageNum, testcase.pageSize)
 		if err != nil {
 			t.Errorf(
 				"List(%v, %s, %d, %d): returned error %s",
@@ -127,7 +127,7 @@ func TestCatalogueServiceCount(t *testing.T) {
 		{[]string{"prime"}, 4},
 		{[]string{"even", "prime"}, 1},
 	} {
-		have, err := s.Count(testcase.tags)
+		have, err := s.Count(nil, testcase.tags)
 		if err != nil {
 			t.Errorf(
 				"Count(%v): returned error %s",
@@ -166,7 +166,7 @@ func TestCatalogueServiceGet(t *testing.T) {
 			"0",
 		} {
 			want := ErrNotFound
-			if _, have := s.Get(id); want != have {
+			if _, have := s.Get(nil, id); want != have {
 				t.Errorf("Get(%s): want %v, have %v", id, want, have)
 			}
 		}
@@ -176,7 +176,7 @@ func TestCatalogueServiceGet(t *testing.T) {
 		for id, want := range map[string]Sock{
 			"3": s3,
 		} {
-			have, err := s.Get(id)
+			have, err := s.Get(nil, id)
 			if err != nil {
 				t.Errorf("Get(%s): %v", id, err)
 				continue
@@ -207,7 +207,7 @@ func TestCatalogueServiceTags(t *testing.T) {
 
 	s := NewCatalogueService(sqlxDB, logger)
 
-	have, err := s.Tags()
+	have, err := s.Tags(nil)
 	if err != nil {
 		t.Errorf("Tags(): %v", err)
 	}

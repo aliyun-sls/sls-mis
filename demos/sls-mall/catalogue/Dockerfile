@@ -8,6 +8,10 @@ ENV OTLP_ENDPOINT="" \
     DEPLOYMENT_ENVIRONMENT="production" \
     SERVICE_VERSION="1.1.0"
 
+LABEL "app"="catalogue"
+LABEL "demo"="sls-mall"
+LABEL "language"="go"
+
 WORKDIR /sls-mall
 
 COPY app .

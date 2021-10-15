@@ -5,6 +5,9 @@ package catalogue
 
 import (
 	"errors"
+	"fmt"
+	"go.opentelemetry.io/otel/trace"
+	"golang.org/x/net/context"
 	"math/rand"
 	"strings"
 	"time"
@@ -16,11 +19,11 @@ import (
 // Service is the catalogue service, providing read operations on a saleable
 // catalogue of sock products.
 type Service interface {
-	List(tags []string, order string, pageNum, pageSize int) ([]Sock, error) // GET /catalogue
-	Count(tags []string) (int, error)                                        // GET /catalogue/size
-	Get(id string) (Sock, error)                                             // GET /catalogue/{id}
-	Tags() ([]string, error)                                                 // GET /tags
-	Health() []Health                                                        // GET /health
+	List(ctx context.Context, tags []string, order string, pageNum, pageSize int) ([]Sock, error) // GET /catalogue
+	Count(ctx context.Context, tags []string) (int, error)                                        // GET /catalogue/size
+	Get(ctx context.Context, id string) (Sock, error)                                             // GET /catalogue/{id}
+	Tags(context.Context) ([]string, error)                                                       // GET /tags
+	Health(context.Context) []Health                                                              // GET /health
 }
 
 // Middleware decorates a Service.
@@ -69,7 +72,8 @@ type catalogueService struct {
 	logger log.Logger
 }
 
-func (s *catalogueService) List(tags []string, order string, pageNum, pageSize int) ([]Sock, error) {
+func (s *catalogueService) List(ctx context.Context, tags []string, order string, pageNum, pageSize int) ([]Sock, error) {
+	spanContext := trace.SpanContextFromContext(ctx)
 	var socks []Sock
 	query := baseQuery
 
@@ -93,10 +97,11 @@ func (s *catalogueService) List(tags []string, order string, pageNum, pageSize i
 	}
 
 	query += ";"
-	s.logger.Log("Operation", "ListProduct", "Sql", query, "Tags", tags, "GroupBy", order)
+	s.logger.Log("content", "查询产品列表", "Operation", "ListProduct", "Sql", query, "Tags", tags, "GroupBy", order, "traceId", spanContext.TraceID.String(),
+		"spanId", spanContext.SpanID.String())
 	err := s.db.Select(&socks, query, args...)
 	if err != nil {
-		s.logger.Log("msg", "查询产品列表失败", "Operation", "ListProduct", "Exception", err)
+		s.logger.Log("content", "查询产品列表失败", "Operation", "ListProduct", "error", err)
 		return []Sock{}, ErrDBConnection
 	}
 
@@ -105,17 +110,15 @@ func (s *catalogueService) List(tags []string, order string, pageNum, pageSize i
 		socks[i].Tags = strings.Split(s.TagString, ",")
 	}
 
-	s.logger.Log("msg", "查询产品列表", "Operation", "ListProduct", "产品数量", len(socks), "页数", pageNum, "每页条数", pageSize)
-	time.Sleep(0 * time.Millisecond)
-
+	s.logger.Log("content", fmt.Sprintf("产品列表查询结果: %d", len(socks)), "Operation", "ListProduct", "traceId", spanContext.TraceID.String(), "spanId", spanContext.SpanID.String())
 	socks = cut(socks, pageNum, pageSize)
 
 	return socks, nil
 }
 
-func (s *catalogueService) Count(tags []string) (int, error) {
+func (s *catalogueService) Count(ctx context.Context, tags []string) (int, error) {
 	query := "SELECT COUNT(DISTINCT sock.sock_id) FROM sock JOIN sock_tag ON sock.sock_id=sock_tag.sock_id JOIN tag ON sock_tag.tag_id=tag.tag_id"
-
+	spanContext := trace.SpanContextFromContext(ctx)
 	var args []interface{}
 
 	for i, t := range tags {
@@ -129,11 +132,13 @@ func (s *catalogueService) Count(tags []string) (int, error) {
 	}
 
 	query += ";"
-	s.logger.Log("Operation", "ProductCount", "Sql", query, "SQL参数", tags, "查询产品数量")
+	s.logger.Log("content", "查询产品数量", "Operation", "ProductCount", "SQL", query, "SQL参数", tags, "traceId", spanContext.TraceID.String(),
+		"spanId", spanContext.SpanID.String())
 	sel, err := s.db.Prepare(query)
 
 	if err != nil {
-		s.logger.Log("msg", "查询产品数量失败", "Operation", "ProductCount", "Exception", err)
+		s.logger.Log("content", "查询产品数量失败", "Operation", "ProductCount", "error", err, "traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String())
 		return 0, ErrDBConnection
 	}
 	defer sel.Close()
@@ -142,21 +147,25 @@ func (s *catalogueService) Count(tags []string) (int, error) {
 	err = sel.QueryRow(args...).Scan(&count)
 
 	if err != nil {
-		s.logger.Log("msg", "查询产品数量失败", "Operation", "ProductCount", "Exception", err)
+		s.logger.Log("content", "查询产品数量失败", "Operation", "ProductCount", "error", err, "traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String())
 		return 0, ErrDBConnection
 	}
 
+	s.logger.Log("content", fmt.Sprintf("查询产品数量结果: %d", count), "Operation", "ListProduct", "traceId", spanContext.TraceID.String(), "spanId", spanContext.SpanID.String())
 	return count, nil
 }
 
-func (s *catalogueService) Get(id string) (Sock, error) {
+func (s *catalogueService) Get(ctx context.Context, id string) (Sock, error) {
+	spanContext := trace.SpanContextFromContext(ctx)
 	query := baseQuery + " WHERE sock.sock_id =? GROUP BY sock.sock_id;"
 
-	s.logger.Log("msg", "查询产品详情", "Operation", "GetProductDetail", "产品ID", id, "SQL", query)
+	s.logger.Log("content", "查询产品详情", "Operation", "GetProductDetail", "ProductID", id, "SQL", query)
 	var sock Sock
 	err := s.db.Get(&sock, query, id)
 	if err != nil {
-		s.logger.Log("msg", "查询产品详情失败", "Operation", "GetProductDetail", "产品ID", id, "Exception", err)
+		s.logger.Log("content", "查询产品详情失败", "Operation", "GetProductDetail", "ProductID", id, "error", err, "traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String())
 		return Sock{}, ErrNotFound
 	}
 
@@ -166,7 +175,7 @@ func (s *catalogueService) Get(id string) (Sock, error) {
 	return sock, nil
 }
 
-func (s *catalogueService) Health() []Health {
+func (s *catalogueService) Health(context.Context) []Health {
 	var health []Health
 	dbstatus := "OK"
 
@@ -184,11 +193,13 @@ func (s *catalogueService) Health() []Health {
 	return health
 }
 
-func (s *catalogueService) Tags() ([]string, error) {
+func (s *catalogueService) Tags(ctx context.Context) ([]string, error) {
+	spanContext := trace.SpanContextFromContext(ctx)
 	var tags []string
 	query := "call selectTags(?);"
 
-	s.logger.Log("msg", "查询产品标签", "Operation", "ListTags", "sql", query)
+	s.logger.Log("content", "查询产品标签", "Operation", "ListTags", "sql", query, "traceId", spanContext.TraceID.String(),
+		"spanId", spanContext.SpanID.String())
 
 	var sleepTime int
 	if rand.Intn(100) > 60 {
@@ -198,7 +209,8 @@ func (s *catalogueService) Tags() ([]string, error) {
 	}
 	rows, err := s.db.Query(query, sleepTime)
 	if err != nil {
-		s.logger.Log("msg", "查询产品标签失败", "Operation", "ListTags", "exception", err)
+		s.logger.Log("content", "查询产品标签失败", "Operation", "ListTags", "error", err, "traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String())
 		return []string{}, ErrDBConnection
 	}
 	for rows.Next() {
@@ -206,7 +218,8 @@ func (s *catalogueService) Tags() ([]string, error) {
 		var tag string
 		err = rows.Scan(&id, &tag)
 		if err != nil {
-			s.logger.Log("msg", "查询产品标签失败", "Operation", "ListTags", "exception", err)
+			s.logger.Log("content", "查询产品标签失败", "Operation", "ListTags", "error", err, "traceId", spanContext.TraceID.String(),
+				"spanId", spanContext.SpanID.String())
 			continue
 		}
 		tags = append(tags, tag)
