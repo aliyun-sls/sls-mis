@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/net/context"
-	"math/rand"
 	"strings"
 	"time"
 
@@ -201,22 +200,15 @@ func (s *catalogueService) Tags(ctx context.Context) ([]string, error) {
 	s.logger.Log("content", "查询产品标签", "Operation", "ListTags", "sql", query, "traceId", spanContext.TraceID.String(),
 		"spanId", spanContext.SpanID.String())
 
-	var sleepTime int
-	if rand.Intn(100) > 60 {
-		sleepTime = 0
-	} else {
-		sleepTime = 1
-	}
-	rows, err := s.db.Query(query, sleepTime)
+	rows, err := s.db.Query(query, "1.2.0")
 	if err != nil {
 		s.logger.Log("content", "查询产品标签失败", "Operation", "ListTags", "error", err, "traceId", spanContext.TraceID.String(),
 			"spanId", spanContext.SpanID.String())
 		return []string{}, ErrDBConnection
 	}
 	for rows.Next() {
-		var id int
 		var tag string
-		err = rows.Scan(&id, &tag)
+		err = rows.Scan(&tag)
 		if err != nil {
 			s.logger.Log("content", "查询产品标签失败", "Operation", "ListTags", "error", err, "traceId", spanContext.TraceID.String(),
 				"spanId", spanContext.SpanID.String())
