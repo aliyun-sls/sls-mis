@@ -28,6 +28,7 @@ func (mw loggingMiddleware) List(ctx context.Context, tags []string, order strin
 	defer func(begin time.Time) {
 		spanContext := trace.SpanContextFromContext(ctx)
 		mw.logger.Log(
+			"Operation", "ListProduct",
 			"method", "List",
 			"tags", strings.Join(tags, ", "),
 			"order", order,
@@ -47,6 +48,7 @@ func (mw loggingMiddleware) Count(ctx context.Context, tags []string) (n int, er
 	defer func(begin time.Time) {
 		spanContext := trace.SpanContextFromContext(ctx)
 		mw.logger.Log(
+			"Operation", "ProductCount",
 			"method", "Count",
 			"tags", strings.Join(tags, ", "),
 			"result", n,
@@ -63,6 +65,7 @@ func (mw loggingMiddleware) Get(ctx context.Context, id string) (s Sock, err err
 	defer func(begin time.Time) {
 		spanContext := trace.SpanContextFromContext(ctx)
 		mw.logger.Log(
+			"Operation", "GetProductDetail",
 			"method", "Get",
 			"id", id,
 			"sock", s.ID,
@@ -79,6 +82,7 @@ func (mw loggingMiddleware) Tags(ctx context.Context) (tags []string, err error)
 	defer func(begin time.Time) {
 		spanContext := trace.SpanContextFromContext(ctx)
 		mw.logger.Log(
+			"Operation", "ListTags",
 			"method", "Tags",
 			"result", len(tags),
 			"err", err,
