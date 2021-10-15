@@ -6,6 +6,10 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
+
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Middleware decorates a service.
@@ -30,21 +34,37 @@ type Health struct {
 // NewFixedService returns a simple implementation of the Service interface,
 // fixed over a predefined set of socks and tags. In a real service you'd
 // probably construct this with a database handle to your socks DB, etc.
-func NewAuthorisationService(declineOverAmount float32) Service {
+func NewAuthorisationService(declineOverAmount float32, logger log.Logger) Service {
 	return &service{
 		declineOverAmount: declineOverAmount,
+		logger:            logger,
 	}
 }
 
 type service struct {
 	declineOverAmount float32
+	logger            log.Logger
 }
 
-func deductFromCart(amount float32) error {
+func (s *service) deductFromCart(ctx context.Context, amount float32) error {
+	spanContext := trace.SpanContextFromContext(ctx)
+	level.Info(s.logger).Log("traceId", spanContext.TraceID.String(),
+		"spanId", spanContext.SpanID.String(),
+		"content", "start deduct from cart",
+		"amount", amount)
 	if rand.Int()%5 == 0 {
+		// mock deduct timeout!!!
 		time.Sleep(6 * time.Second)
-		return errors.New("Deduct money from your bank card timeout")
+		err := errors.New("Deduct money from your bank card timeout")
+		level.Error(s.logger).Log("traceId", spanContext.TraceID.String(),
+			"spanId", spanContext.SpanID.String(),
+			"content", "deduct from cart error",
+			"error", err.Error())
+		return err
 	}
+	level.Info(s.logger).Log("traceId", spanContext.TraceID.String(),
+		"spanId", spanContext.SpanID.String(),
+		"content", "deduct from cart success")
 	return nil
 }
 
@@ -64,8 +84,9 @@ func (s *service) Authorise(ctx context.Context, amount float32) (Authorisation,
 		message = fmt.Sprintf("Payment declined: amount exceeds %.2f", s.declineOverAmount)
 	}
 
-	err := deductFromCart(amount)
+	err := s.deductFromCart(ctx, amount)
 	if err != nil {
+
 		authorised = false
 	}
 

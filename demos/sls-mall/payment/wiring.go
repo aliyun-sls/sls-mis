@@ -53,7 +53,7 @@ func WireUp(ctx context.Context, declineAmount float32, serviceName string) (htt
 	// Service domain.
 	var service Service
 	{
-		service = NewAuthorisationService(declineAmount)
+		service = NewAuthorisationService(declineAmount, logger)
 		service = LoggingMiddleware(logger)(service)
 	}
 
