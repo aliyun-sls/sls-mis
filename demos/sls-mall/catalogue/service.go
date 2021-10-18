@@ -6,6 +6,8 @@ package catalogue
 import (
 	"errors"
 	"fmt"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/label"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/net/context"
 	"strings"
@@ -72,7 +74,11 @@ type catalogueService struct {
 }
 
 func (s *catalogueService) List(ctx context.Context, tags []string, order string, pageNum, pageSize int) ([]Sock, error) {
-	spanContext := trace.SpanContextFromContext(ctx)
+	t := otel.Tracer("catalogue")
+	context, span := t.Start(ctx, "GetProjectList")
+	defer span.End();
+
+	spanContext := trace.SpanContextFromContext(context)
 	var socks []Sock
 	query := baseQuery
 
@@ -94,6 +100,8 @@ func (s *catalogueService) List(ctx context.Context, tags []string, order string
 		query += " ORDER BY ?"
 		args = append(args, order)
 	}
+
+	span.SetAttributes(label.KeyValue{Key: "db.statement", Value: label.StringValue(query)})
 
 	query += ";"
 	s.logger.Log("content", "查询产品列表", "Operation", "ListProduct", "Sql", query, "Tags", tags, "GroupBy", order, "traceId", spanContext.TraceID.String(),
@@ -117,7 +125,11 @@ func (s *catalogueService) List(ctx context.Context, tags []string, order string
 
 func (s *catalogueService) Count(ctx context.Context, tags []string) (int, error) {
 	query := "SELECT COUNT(DISTINCT sock.sock_id) FROM sock JOIN sock_tag ON sock.sock_id=sock_tag.sock_id JOIN tag ON sock_tag.tag_id=tag.tag_id"
-	spanContext := trace.SpanContextFromContext(ctx)
+	t := otel.Tracer("catalogue")
+	context, span := t.Start(ctx, "ProjectCount")
+	defer span.End();
+
+	spanContext := trace.SpanContextFromContext(context)
 	var args []interface{}
 
 	for i, t := range tags {
@@ -129,6 +141,8 @@ func (s *catalogueService) Count(ctx context.Context, tags []string) (int, error
 			args = append(args, t)
 		}
 	}
+
+	span.SetAttributes(label.KeyValue{Key: "db.statement", Value: label.StringValue(query)})
 
 	query += ";"
 	s.logger.Log("content", "查询产品数量", "Operation", "ProductCount", "SQL", query, "SQL参数", tags, "traceId", spanContext.TraceID.String(),
@@ -156,9 +170,14 @@ func (s *catalogueService) Count(ctx context.Context, tags []string) (int, error
 }
 
 func (s *catalogueService) Get(ctx context.Context, id string) (Sock, error) {
-	spanContext := trace.SpanContextFromContext(ctx)
-	query := baseQuery + " WHERE sock.sock_id =? GROUP BY sock.sock_id;"
+	t := otel.Tracer("catalogue")
+	context, span := t.Start(ctx, "GetProjectDetail")
+	defer span.End();
 
+	spanContext := trace.SpanContextFromContext(context)
+
+	query := baseQuery + " WHERE sock.sock_id =? GROUP BY sock.sock_id;"
+	span.SetAttributes(label.KeyValue{Key: "db.statement", Value: label.StringValue(query)})
 	s.logger.Log("content", "查询产品详情", "Operation", "GetProductDetail", "ProductID", id, "SQL", query)
 	var sock Sock
 	err := s.db.Get(&sock, query, id)
@@ -193,10 +212,15 @@ func (s *catalogueService) Health(context.Context) []Health {
 }
 
 func (s *catalogueService) Tags(ctx context.Context) ([]string, error) {
-	spanContext := trace.SpanContextFromContext(ctx)
+	t := otel.Tracer("catalogue")
+	context, span := t.Start(ctx, "Tags")
+	defer span.End();
+
+	spanContext := trace.SpanContextFromContext(context)
+
 	var tags []string
 	query := "call selectTags(?);"
-
+	span.SetAttributes(label.KeyValue{Key: "db.statement", Value: label.StringValue(query)})
 	s.logger.Log("content", "查询产品标签", "Operation", "ListTags", "sql", query, "traceId", spanContext.TraceID.String(),
 		"spanId", spanContext.SpanID.String(), "version", "1.2.0")
 
