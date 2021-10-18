@@ -1,5 +1,5 @@
 IMAGE_NAME = sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/load-test
-IMAGE_VERSION = 1.0.0
+IMAGE_VERSION = 1.1.0
 
 build_image:
 	docker build -t $(IMAGE_NAME):$(IMAGE_VERSION) -t $(IMAGE_NAME):latest .

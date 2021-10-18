@@ -27,6 +27,7 @@ type loggingMiddleware struct {
 func (mw loggingMiddleware) List(ctx context.Context, tags []string, order string, pageNum, pageSize int) (socks []Sock, err error) {
 	defer func(begin time.Time) {
 		spanContext := trace.SpanContextFromContext(ctx)
+		took := time.Since(begin).Microseconds()
 		mw.logger.Log(
 			"Operation", "ListProduct",
 			"method", "List",
@@ -38,7 +39,7 @@ func (mw loggingMiddleware) List(ctx context.Context, tags []string, order strin
 			"err", err,
 			"traceId", spanContext.TraceID.String(),
 			"spanId", spanContext.SpanID.String(),
-			"took", time.Since(begin).Microseconds(),
+			"took", took,
 		)
 	}(time.Now())
 	return mw.next.List(ctx, tags, order, pageNum, pageSize)
@@ -47,6 +48,7 @@ func (mw loggingMiddleware) List(ctx context.Context, tags []string, order strin
 func (mw loggingMiddleware) Count(ctx context.Context, tags []string) (n int, err error) {
 	defer func(begin time.Time) {
 		spanContext := trace.SpanContextFromContext(ctx)
+		took := time.Since(begin).Microseconds()
 		mw.logger.Log(
 			"Operation", "ProductCount",
 			"method", "Count",
@@ -55,7 +57,7 @@ func (mw loggingMiddleware) Count(ctx context.Context, tags []string) (n int, er
 			"err", err,
 			"traceId", spanContext.TraceID.String(),
 			"spanId", spanContext.SpanID.String(),
-			"took", time.Since(begin).Microseconds(),
+			"took", took,
 		)
 	}(time.Now())
 	return mw.next.Count(ctx, tags)
@@ -64,6 +66,7 @@ func (mw loggingMiddleware) Count(ctx context.Context, tags []string) (n int, er
 func (mw loggingMiddleware) Get(ctx context.Context, id string) (s Sock, err error) {
 	defer func(begin time.Time) {
 		spanContext := trace.SpanContextFromContext(ctx)
+		took := time.Since(begin).Microseconds()
 		mw.logger.Log(
 			"Operation", "GetProductDetail",
 			"method", "Get",
@@ -72,7 +75,7 @@ func (mw loggingMiddleware) Get(ctx context.Context, id string) (s Sock, err err
 			"err", err,
 			"traceId", spanContext.TraceID.String(),
 			"spanId", spanContext.SpanID.String(),
-			"took", time.Since(begin).Microseconds(),
+			"took", took,
 		)
 	}(time.Now())
 	return mw.next.Get(ctx, id)
@@ -81,6 +84,7 @@ func (mw loggingMiddleware) Get(ctx context.Context, id string) (s Sock, err err
 func (mw loggingMiddleware) Tags(ctx context.Context) (tags []string, err error) {
 	defer func(begin time.Time) {
 		spanContext := trace.SpanContextFromContext(ctx)
+		took := time.Since(begin).Microseconds()
 		mw.logger.Log(
 			"Operation", "ListTags",
 			"method", "Tags",
@@ -88,8 +92,14 @@ func (mw loggingMiddleware) Tags(ctx context.Context) (tags []string, err error)
 			"err", err,
 			"traceId", spanContext.TraceID.String(),
 			"spanId", spanContext.SpanID.String(),
-			"took", time.Since(begin).Microseconds(),
+			"took", took,
 		)
+
+		if took > 5*1000 {
+			mw.logger.Log("content", "执行获取[Tag]方法超过5秒", "traceId", spanContext.TraceID.String(),
+				"spanId", spanContext.SpanID.String())
+		}
+
 	}(time.Now())
 	return mw.next.Tags(ctx)
 }

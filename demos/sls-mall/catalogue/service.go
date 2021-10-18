@@ -76,7 +76,7 @@ type catalogueService struct {
 func (s *catalogueService) List(ctx context.Context, tags []string, order string, pageNum, pageSize int) ([]Sock, error) {
 	t := otel.Tracer("catalogue")
 	context, span := t.Start(ctx, "GetProjectList")
-	defer span.End();
+	defer span.End()
 
 	spanContext := trace.SpanContextFromContext(context)
 	var socks []Sock
@@ -127,7 +127,7 @@ func (s *catalogueService) Count(ctx context.Context, tags []string) (int, error
 	query := "SELECT COUNT(DISTINCT sock.sock_id) FROM sock JOIN sock_tag ON sock.sock_id=sock_tag.sock_id JOIN tag ON sock_tag.tag_id=tag.tag_id"
 	t := otel.Tracer("catalogue")
 	context, span := t.Start(ctx, "ProjectCount")
-	defer span.End();
+	defer span.End()
 
 	spanContext := trace.SpanContextFromContext(context)
 	var args []interface{}
@@ -172,7 +172,7 @@ func (s *catalogueService) Count(ctx context.Context, tags []string) (int, error
 func (s *catalogueService) Get(ctx context.Context, id string) (Sock, error) {
 	t := otel.Tracer("catalogue")
 	context, span := t.Start(ctx, "GetProjectDetail")
-	defer span.End();
+	defer span.End()
 
 	spanContext := trace.SpanContextFromContext(context)
 
@@ -214,7 +214,7 @@ func (s *catalogueService) Health(context.Context) []Health {
 func (s *catalogueService) Tags(ctx context.Context) ([]string, error) {
 	t := otel.Tracer("catalogue")
 	context, span := t.Start(ctx, "Tags")
-	defer span.End();
+	defer span.End()
 
 	spanContext := trace.SpanContextFromContext(context)
 
@@ -225,6 +225,8 @@ func (s *catalogueService) Tags(ctx context.Context) ([]string, error) {
 		"spanId", spanContext.SpanID.String(), "version", "1.2.0")
 
 	rows, err := s.db.Query(query, "1.2.0")
+	defer rows.Close()
+
 	if err != nil {
 		s.logger.Log("content", "查询产品标签失败", "Operation", "ListTags", "error", err, "traceId", spanContext.TraceID.String(),
 			"spanId", spanContext.SpanID.String())
