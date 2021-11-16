@@ -5,9 +5,10 @@ ENV DEPLOY_HOME="/opentelemetry" \
     PROJECT="" \
     LOGSTORE="" \
     ENDPOINT="" \
-    SERVICE_NAME="opentelementry-java-1.1.0" \
-    SERVICE_VERSION="v1.1.0" \
+    SERVICE_NAME="opentelementry-java" \
+    SERVICE_VERSION="v2.0.0" \
     SERVICE_HOST="127.0.0.1" \
+    SERVICE_NAMESPACE="opentelemetry-demo" \
     SERVICE_CONFIG_PATH=""
 
 WORKDIR /opentelemetry
