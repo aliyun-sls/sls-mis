@@ -14,7 +14,7 @@ ENV DEPLOY_HOME="/opentelemetry" \
 WORKDIR /opentelemetry
 
 COPY ./docker/startup.sh /opentelemetry/
-COPY ./target/opentelemetry-javaagent-all.jar  /opentelemetry/
+COPY ./target/opentelemetry-javaagent.jar  /opentelemetry/
 COPY ./target/opentelemetry-java.jar  /opentelemetry/
 
 EXPOSE 8085
