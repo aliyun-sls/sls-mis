@@ -23,6 +23,7 @@ import (
 
 const (
 	ServiceName = "payment"
+	ServiceNamespace = "payment"
 )
 
 // Log domain.
@@ -88,6 +89,8 @@ func initTracer() {
 			semconv.HostNameKey.String(hostname),
 			semconv.DeploymentEnvironmentKey.String(environment),
 			semconv.ServiceVersionKey.String(version),
+			semconv.ServiceNamespaceKey.String(ServiceNamespace),
+			semconv.ProcessPIDKey.Int(os.Getpid()),
 		)))
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))

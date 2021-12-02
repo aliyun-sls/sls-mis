@@ -2,7 +2,7 @@ FROM golang:1.16.4
 
 ENV OTLP_ENDPOINT="" \
     DEPLOYMENT_ENVIRONMENT="production" \
-    SERVICE_VERSION="1.1.0"
+    SERVICE_VERSION="1.3.0"
 
 WORKDIR /sls-mall
 LABEL "app"="payment"
