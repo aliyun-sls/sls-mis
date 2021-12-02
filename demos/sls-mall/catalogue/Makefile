@@ -1,5 +1,5 @@
 IMAGE_NAME = sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/catalogue
-IMAGE_VERSION = 1.2.0
+IMAGE_VERSION = 1.3.0
 
 build_project:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app ./cmd/cataloguesvc

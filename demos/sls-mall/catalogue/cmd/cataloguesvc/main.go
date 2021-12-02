@@ -29,6 +29,7 @@ import (
 
 const (
 	ServiceName = "catalogue"
+	ServiceNamespace = "catalogue"
 )
 
 var (
@@ -109,6 +110,8 @@ func initTracer() {
 				semconv.HostNameKey.String(hostname),
 				semconv.DeploymentEnvironmentKey.String(environment),
 				semconv.ServiceVersionKey.String(version),
+				semconv.ProcessPIDKey.Int(os.Getpid()),
+				semconv.ServiceNamespaceKey.String(ServiceNamespace),
 			)))
 	otel.SetTracerProvider(tp)
 	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
