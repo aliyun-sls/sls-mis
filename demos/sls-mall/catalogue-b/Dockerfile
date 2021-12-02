@@ -6,7 +6,7 @@ ENV OTLP_ENDPOINT="" \
     MYSQL_PASSWORD="root" \
     MYSQL_DATABASE="socksdb" \
     DEPLOYMENT_ENVIRONMENT="production" \
-    SERVICE_VERSION="1.3.0"
+    SERVICE_VERSION="1.4.0"
 
 LABEL "app"="catalogue"
 LABEL "demo"="sls-mall"
