@@ -12,7 +12,8 @@ const {CollectorTraceExporter} = require('@opentelemetry/exporter-collector-grpc
 
 const {ExpressInstrumentation} = require('@opentelemetry/instrumentation-express');
 const {HttpInstrumentation} = require('@opentelemetry/instrumentation-http');
-const {hostname} = require("os");
+const {hostname, pid} = require("os");
+const process = require('process');
 
 module.exports = (parameter) => {
     const provider = new NodeTracerProvider({
@@ -20,7 +21,9 @@ module.exports = (parameter) => {
             [SemanticResourceAttributes.SERVICE_NAME]: parameter.service_name,
             [SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]: "production",
             [SemanticResourceAttributes.SERVICE_VERSION]: parameter.version,
-            [SemanticResourceAttributes.HOST_NAME]: hostname()
+            [SemanticResourceAttributes.HOST_NAME]: hostname(),
+            [SemanticResourceAttributes.PROCESS_PID]: process.pid,
+            [SemanticResourceAttributes.SERVICE_NAMESPACE]: parameter.service_name
         })
     });
     provider.register();
