@@ -1,0 +1,8 @@
+---
+startDelaySeconds: 0
+hostPort: 127.0.0.1:8888
+username:
+password:
+ssl: false
+lowercaseOutputName: false
+lowercaseOutputLabelNames: false

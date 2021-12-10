@@ -1,23 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
 
+    <modelVersion>4.0.0</modelVersion>
     <groupId>works.weave.microservices-demo</groupId>
     <artifactId>shipping</artifactId>
     <packaging>jar</packaging>
-
     <name>shipping</name>
-    <description>Shipping service for microservices-demo application</description>
+    <description>Shipping service for microservices-demo
+        application
+    </description>
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.4.0.RELEASE</version>
     </parent>
-
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.sourceEncoding>
+            UTF-8
+        </project.build.sourceEncoding>
         <java.version>1.8</java.version>
         <prometheus.version>0.0.21</prometheus.version>
         <ot-agent.download.url>
@@ -25,7 +27,6 @@
         </ot-agent.download.url>
         <ot-agent.version>v1.0.1</ot-agent.version>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -69,8 +70,11 @@
             <version>0.8.4</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
     </dependencies>
-
     <build>
         <finalName>shipping</finalName>
         <plugins>
@@ -125,8 +129,11 @@
                         </goals>
                         <configuration>
                             <url>${ot-agent.download.url}</url>
-                            <fromFile>${ot-agent.version}/opentelemetry-javaagent-all.jar</fromFile>
-                            <toDir>${project.build.directory}</toDir>
+                            <fromFile>
+                                ${ot-agent.version}/opentelemetry-javaagent-all.jar
+                            </fromFile>
+                            <toDir>${project.basedir}/agents</toDir>
+                            <skipIfExists>true</skipIfExists>
                         </configuration>
                     </execution>
                 </executions>
@@ -138,11 +145,15 @@
                 <configuration>
                     <images>
                         <image>
-                            <name>sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/${build.finalName}</name>
+                            <name>
+                                sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/${build.finalName}
+                            </name>
                             <build>
-                                <dockerFile>${project.basedir}/Dockerfile</dockerFile>
+                                <dockerFile>
+                                    ${project.basedir}/Dockerfile
+                                </dockerFile>
                                 <tags>
-                                    <tag>1.1.0</tag>
+                                    <tag>1.3.0</tag>
                                     <tag>latest</tag>
                                 </tags>
                             </build>
@@ -152,7 +163,6 @@
             </plugin>
         </plugins>
     </build>
-
     <repositories>
         <repository>
             <id>spring-releases</id>
