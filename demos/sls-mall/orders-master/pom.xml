@@ -77,6 +77,10 @@
             <artifactId>opentelemetry-api</artifactId>
             <version>1.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -151,7 +155,7 @@
                             <build>
                                 <dockerFile>${project.basedir}/Dockerfile</dockerFile>
                                 <tags>
-                                    <tag>1.2.0</tag>
+                                    <tag>1.4.0</tag>
                                     <tag>latest</tag>
                                 </tags>
                             </build>

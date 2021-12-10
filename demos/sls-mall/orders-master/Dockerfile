@@ -11,6 +11,7 @@ ENV PROJECT="" \
 WORKDIR /sls-mall
 COPY target/orders.jar ./app.jar
 COPY agents/opentelemetry-javaagent-all.jar .
+COPY agent/jolokia-jvm-1.7.1.jar .
 COPY startup.sh .
 RUN chmod +x startup.sh
 EXPOSE 8086
