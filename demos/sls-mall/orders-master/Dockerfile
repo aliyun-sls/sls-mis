@@ -12,6 +12,8 @@ WORKDIR /sls-mall
 COPY target/orders.jar ./app.jar
 COPY agents/opentelemetry-javaagent-all.jar .
 COPY agent/jolokia-jvm-1.7.1.jar .
+COPY agent/jmx_prometheus_javaagent-0.16.1.jar .
+COPY config.yaml .
 COPY startup.sh .
 RUN chmod +x startup.sh
 EXPOSE 8086
