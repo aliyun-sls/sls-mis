@@ -15,6 +15,26 @@
         WeaveSocks
     </title>
 
+    <script src="https://o.alicdn.com/sls/sls-rum/sls-rum.js"></script>
+    <script>
+       window.SLS_RUM &&
+          SLS_RUM.init({
+            host: 'cn-beijing.log.aliyuncs.com',
+            project: 'qs-demos',
+            logstore: 'sls-mall-rum-raw',
+            instance: 'sls-mall',
+            env:  'prod',
+            service:  'web',
+            sessionReplay:  'false',
+            enableError:  true,
+            enableResourcePerf:  true,
+            enableAjax:  true,
+            enablePerf:  true,
+            enableTrace:  true,
+            sampleRate:  1,
+          })
+    </script>
+
     <meta name="keywords" content="">
 
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,500,700,300,100'
