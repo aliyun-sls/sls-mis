@@ -5,6 +5,11 @@ import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.metrics.DoubleHistogram;
 import io.opentelemetry.api.metrics.Meter;
+import io.opentelemetry.api.metrics.ObservableDoubleGauge;
+import io.opentelemetry.api.metrics.ObservableDoubleMeasurement;
+import io.opentelemetry.api.metrics.ObservableLongMeasurement;
+import io.opentelemetry.api.metrics.ObservableLongUpDownCounter;
+import io.opentelemetry.api.trace.TraceId;
 import io.opentelemetry.exporter.otlp.metrics.OtlpGrpcMetricExporter;
 import io.opentelemetry.sdk.OpenTelemetrySdk;
 import io.opentelemetry.sdk.common.Clock;
@@ -18,6 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class TimerMetric {
 
@@ -50,11 +56,25 @@ public class TimerMetric {
     public static void main(String[] args) throws InterruptedException {
         Meter meter = GlobalOpenTelemetry.getMeterProvider().meterBuilder("test-metric").build();
         DoubleHistogram histogram = meter.histogramBuilder("test-metric-1").setUnit("c").setDescription("").build();
+        ObservableDoubleGauge doubleGauge = meter.gaugeBuilder("test-metric-2").setUnit("s").buildWithCallback(new Consumer<ObservableDoubleMeasurement>() {
+            @Override public void accept(ObservableDoubleMeasurement measurement) {
+                measurement.record(ThreadLocalRandom.current().nextDouble(100.00),
+                    Attributes.of(AttributeKey.stringKey("traceId"), TraceId.fromLongs(ThreadLocalRandom.current().nextLong(), ThreadLocalRandom.current().nextLong())));
+            }
+        });
+
+        ObservableLongUpDownCounter counter = meter.upDownCounterBuilder("test-metric-3").setUnit("a").buildWithCallback(new Consumer<ObservableLongMeasurement>() {
+            @Override public void accept(ObservableLongMeasurement measurement) {
+                measurement.record(ThreadLocalRandom.current().nextLong(2),
+                    Attributes.of(AttributeKey.stringKey("traceId"), TraceId.fromLongs(ThreadLocalRandom.current().nextLong(), ThreadLocalRandom.current().nextLong())));
+            }
+        });
+
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(3);
         executor.scheduleWithFixedDelay(() -> {
-            histogram.record(ThreadLocalRandom.current().nextDouble(1000.00));
+            histogram.record(ThreadLocalRandom.current().nextDouble(10.00));
             System.out.println("[" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + "] Add Metric success");
-        }, 0, 500, TimeUnit.MILLISECONDS);
+        }, 0, 1, TimeUnit.MILLISECONDS);
         Thread.currentThread().join();
     }
 }
