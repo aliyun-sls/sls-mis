@@ -3,3 +3,5 @@ target/
 *.iml
 *.jar
 .DS_Store
+.classpath
+.project
