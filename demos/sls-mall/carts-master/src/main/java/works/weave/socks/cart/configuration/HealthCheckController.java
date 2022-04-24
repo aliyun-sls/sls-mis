@@ -1,4 +1,4 @@
-package works.weave.socks.cart.controllers;
+package works.weave.socks.cart.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
