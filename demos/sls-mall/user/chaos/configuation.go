@@ -31,6 +31,15 @@ type ChaosConfiguration struct {
 	server_max_sleep_time_us int64
 }
 
+func init() {
+	flag.StringVar(&client_max_sleep_time_us, "client_max_sleep_time_us", os.Getenv("CLIENT_MAX_SLEEP_TIME_US"), "")
+	flag.StringVar(&client_min_sleep_time_us, "client_min_sleep_time_us", os.Getenv("CLIENT_MIN_SLEEP_TIME_US"), "")
+	flag.StringVar(&slow_p, "slow_p", os.Getenv("SLOW_P"), "")
+	flag.StringVar(&server_min_sleep_time_us, "server_min_sleep_time_us", os.Getenv("SERVER_MIN_SLEEP_TIME_US"), "")
+	flag.StringVar(&throw_exception_p, "throw_exception_p", os.Getenv("THROW_EXCEPTION_P"), "")
+	flag.StringVar(&server_max_sleep_time_us, "server_max_sleep_time_us", os.Getenv("SERVER_MAX_SLEEP_TIME_US"), "")
+}
+
 type ChaosMiddleware struct {
 	config *ChaosConfiguration
 	next   api.Service
@@ -54,11 +63,11 @@ func (c ChaosMiddleware) Register(ctx context.Context, username, password, email
 }
 
 func (c ChaosMiddleware) GetUsers(ctx context.Context, id string) ([]users.User, error) {
-	if rand.Intn(100) > c.config.slow_p {
+	if rand.Intn(100) > (1 - c.config.slow_p) {
 		time.Sleep(time.Duration(rand.Int63n(c.config.server_max_sleep_time_us-c.config.server_min_sleep_time_us)+c.config.server_min_sleep_time_us) * time.Microsecond)
 	}
 
-	if rand.Intn(100) > c.config.throw_exception_p {
+	if rand.Intn(100) > (1 - c.config.throw_exception_p) {
 		return nil, errors.New("Mock Exception")
 	}
 	return c.next.GetUsers(ctx, id)
@@ -100,12 +109,6 @@ func (c ChaosMiddleware) Health(ctx context.Context, logger log.Logger) []api.He
 }
 
 func NewConfiguration() *ChaosConfiguration {
-	flag.StringVar(&client_max_sleep_time_us, "client_max_sleep_time_us", os.Getenv("CLIENT_MAX_SLEEP_TIME_US"), "")
-	flag.StringVar(&client_min_sleep_time_us, "client_min_sleep_time_us", os.Getenv("CLIENT_MIN_SLEEP_TIME_US"), "")
-	flag.StringVar(&slow_p, "slow_p", os.Getenv("SLOW_P"), "")
-	flag.StringVar(&server_min_sleep_time_us, "server_min_sleep_time_us", os.Getenv("SERVER_MIN_SLEEP_TIME_US"), "")
-	flag.StringVar(&throw_exception_p, "throw_exception_p", os.Getenv("THROW_EXCEPTION_P"), "")
-	flag.StringVar(&server_max_sleep_time_us, "server_max_sleep_time_us", os.Getenv("SERVER_MAX_SLEEP_TIME_US"), "")
 
 	return &ChaosConfiguration{
 		client_max_sleep_time_us: func() int64 {
