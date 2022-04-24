@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/aliyun-sls/opentelemetry-go-provider-sls/provider"
+	"github.com/sls-mis/demos/sls-mall/user/chaos"
 	corelog "log"
 	"net"
 	"net/http"
@@ -70,7 +71,7 @@ func main() {
 	hostname, _ := os.Hostname()
 	slsConfig, err := provider.NewConfig(provider.WithServiceName(serviceName),
 		provider.WithResourceAttributes(map[string]string{
-			"host.name": hostname,
+			"host.name":              hostname,
 			"deployment.environment": deploymentEnvironment,
 			"telemetry.sdk.language": "go",
 		}),
@@ -100,6 +101,7 @@ func main() {
 	var service api.Service
 	{
 		service = api.NewFixedService()
+		service = chaos.NewChaosMiddleware(chaos.NewConfiguration())(service)
 		service = api.LoggingMiddleware(logger)(service)
 	}
 
