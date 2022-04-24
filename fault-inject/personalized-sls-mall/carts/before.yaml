@@ -1,0 +1,320 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '29'
+  creationTimestamp: '2021-05-27T02:39:14Z'
+  generation: 32
+  labels:
+    ahas.aliyun/app-group: sls-mall
+    ahas.aliyun/app-instance: cart
+    app: cart
+    demo: sls-mall
+  managedFields:
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:labels':
+            .: {}
+            'f:ahas.aliyun/app-group': {}
+            'f:ahas.aliyun/app-instance': {}
+            'f:app': {}
+            'f:demo': {}
+        'f:spec':
+          'f:progressDeadlineSeconds': {}
+          'f:replicas': {}
+          'f:revisionHistoryLimit': {}
+          'f:selector': {}
+          'f:strategy':
+            'f:rollingUpdate':
+              .: {}
+              'f:maxSurge': {}
+              'f:maxUnavailable': {}
+            'f:type': {}
+          'f:template':
+            'f:metadata':
+              'f:annotations':
+                .: {}
+                'f:prometheus.io/path': {}
+                'f:prometheus.io/port': {}
+                'f:prometheus.io/scrape': {}
+                'f:redeploy-timestamp': {}
+              'f:labels':
+                .: {}
+                'f:app': {}
+            'f:spec':
+              'f:containers':
+                'k:{"name":"cart"}':
+                  .: {}
+                  'f:env':
+                    .: {}
+                    'k:{"name":"ACCESS_KEY_ID"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:secretKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
+                    'k:{"name":"ACCESS_SECRET"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:secretKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
+                    'k:{"name":"ENDPOINT"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:configMapKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
+                    'k:{"name":"INSTANCE"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:configMapKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
+                    'k:{"name":"NODE_NAME"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:fieldRef':
+                          .: {}
+                          'f:apiVersion': {}
+                          'f:fieldPath': {}
+                    'k:{"name":"POD_ID"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:fieldRef':
+                          .: {}
+                          'f:apiVersion': {}
+                          'f:fieldPath': {}
+                    'k:{"name":"POD_NAME"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:fieldRef':
+                          .: {}
+                          'f:apiVersion': {}
+                          'f:fieldPath': {}
+                    'k:{"name":"POD_NAMESPACE"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:fieldRef':
+                          .: {}
+                          'f:apiVersion': {}
+                          'f:fieldPath': {}
+                    'k:{"name":"PROJECT"}':
+                      .: {}
+                      'f:name': {}
+                      'f:valueFrom':
+                        .: {}
+                        'f:configMapKeyRef':
+                          .: {}
+                          'f:key': {}
+                          'f:name': {}
+                    'k:{"name":"aliyun_logs_logtag-1632992974102_tags"}':
+                      .: {}
+                      'f:name': {}
+                      'f:value': {}
+                  'f:image': {}
+                  'f:imagePullPolicy': {}
+                  'f:name': {}
+                  'f:resources':
+                    .: {}
+                    'f:requests':
+                      .: {}
+                      'f:cpu': {}
+                      'f:memory': {}
+                  'f:terminationMessagePath': {}
+                  'f:terminationMessagePolicy': {}
+                  'f:volumeMounts':
+                    .: {}
+                    'k:{"mountPath":"/etc/localtime"}':
+                      .: {}
+                      'f:mountPath': {}
+                      'f:name': {}
+              'f:dnsPolicy': {}
+              'f:restartPolicy': {}
+              'f:schedulerName': {}
+              'f:securityContext': {}
+              'f:terminationGracePeriodSeconds': {}
+              'f:volumes':
+                .: {}
+                'k:{"name":"volume-localtime"}':
+                  .: {}
+                  'f:hostPath':
+                    .: {}
+                    'f:path': {}
+                    'f:type': {}
+                  'f:name': {}
+      manager: Apache-HttpClient
+      operation: Update
+      time: '2021-12-15T11:49:25Z'
+    - apiVersion: apps/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            .: {}
+            'f:deployment.kubernetes.io/revision': {}
+        'f:status':
+          'f:availableReplicas': {}
+          'f:conditions':
+            .: {}
+            'k:{"type":"Available"}':
+              .: {}
+              'f:lastTransitionTime': {}
+              'f:lastUpdateTime': {}
+              'f:message': {}
+              'f:reason': {}
+              'f:status': {}
+              'f:type': {}
+            'k:{"type":"Progressing"}':
+              .: {}
+              'f:lastTransitionTime': {}
+              'f:lastUpdateTime': {}
+              'f:message': {}
+              'f:reason': {}
+              'f:status': {}
+              'f:type': {}
+          'f:observedGeneration': {}
+          'f:readyReplicas': {}
+          'f:replicas': {}
+          'f:updatedReplicas': {}
+      manager: kube-controller-manager
+      operation: Update
+      time: '2021-12-15T13:03:03Z'
+  name: cart
+  namespace: sls-mall
+  resourceVersion: '80224838'
+  uid: 1ae409e2-1e98-44bd-a89b-64cd3e5767aa
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: cart
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: '8089'
+        prometheus.io/scrape: 'true'
+        redeploy-timestamp: '1639127929833'
+      labels:
+        app: cart
+    spec:
+      containers:
+        - env:
+            - name: ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: HTTPS_ENDPOINT
+                  name: environmenet-variables
+            - name: INSTANCE
+              valueFrom:
+                configMapKeyRef:
+                  key: INSTANCE
+                  name: environmenet-variables
+            - name: PROJECT
+              valueFrom:
+                configMapKeyRef:
+                  key: PROJECT
+                  name: environmenet-variables
+            - name: ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  key: ACCESS_KEY_ID
+                  name: ak
+            - name: ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: ACCESS_SECRET
+                  name: ak
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: POD_ID
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: aliyun_logs_logtag-1632992974102_tags
+              value: application=carts
+          image: 'sls-registry-vpc.cn-beijing.cr.aliyuncs.com/sls-mall/carts:1.4.0'
+          imagePullPolicy: Always
+          name: cart
+          resources:
+            requests:
+              cpu: '1'
+              memory: 1Gi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: volume-localtime
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ''
+          name: volume-localtime
+status:
+  availableReplicas: 3
+  conditions:
+    - lastTransitionTime: '2021-08-25T07:39:20Z'
+      lastUpdateTime: '2021-08-25T07:39:20Z'
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: 'True'
+      type: Available
+    - lastTransitionTime: '2021-05-27T02:39:14Z'
+      lastUpdateTime: '2021-12-15T13:03:03Z'
+      message: ReplicaSet "cart-867dffb89b" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: 'True'
+      type: Progressing
+  observedGeneration: 32
+  readyReplicas: 3
+  replicas: 3
+  updatedReplicas: 3
