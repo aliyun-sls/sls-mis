@@ -1,5 +1,5 @@
 IMAGE_NAME := sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/orders
-IMAGE_VERSION := 1.6.0
+IMAGE_VERSION := 1.7.0
 
 build_project:
 	 ./mvnw clean package -Dmaven.test.skip=true

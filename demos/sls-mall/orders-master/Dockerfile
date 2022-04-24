@@ -6,7 +6,13 @@ ENV PROJECT="" \
     ENDPOINT="" \
     SERVICE_NAME="orders" \
     SERVICE_VERSION="1.1.0" \
-    DEPLOYMENT_ENVIRONMENT="production"
+    DEPLOYMENT_ENVIRONMENT="production" \
+   CLIENT_MAX_SLEEP_TIME_US=0 \
+    CLIENT_MIN_SLEEP_TIME_US=0 \
+    SLOW_P=0 \
+    SERVER_MIN_SLEEP_TIME_US=0 \
+    THROW_EXCEPTION_P=0 \
+    SERVER_MAX_SLEEP_TIME_US=0
 
 WORKDIR /sls-mall
 COPY target/orders.jar ./app.jar

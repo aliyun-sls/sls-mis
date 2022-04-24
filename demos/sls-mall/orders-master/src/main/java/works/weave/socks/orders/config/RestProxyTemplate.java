@@ -1,17 +1,17 @@
 package works.weave.socks.orders.config;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.context.annotation.Bean;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.annotation.PostConstruct;
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 
 @Component
 public final class RestProxyTemplate {
@@ -19,9 +19,13 @@ public final class RestProxyTemplate {
 
     @Autowired RestTemplate restTemplate;
 
+    @Autowired ClientHttpRequestInterceptor clientHttpRequestInterceptor;
+
     @Bean
     public RestTemplate restTemplate() {
-      return new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getInterceptors().add(clientHttpRequestInterceptor);
+        return restTemplate;
     }
 
     @Value("${proxy.host:}")
@@ -47,6 +51,7 @@ public final class RestProxyTemplate {
         factory.setProxy(proxy);
 
         restTemplate.setRequestFactory(factory);
+        restTemplate.getInterceptors().add(clientHttpRequestInterceptor);
     }
 
     public RestTemplate getRestTemplate() {
