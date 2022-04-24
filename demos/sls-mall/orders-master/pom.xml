@@ -159,7 +159,7 @@
                             <build>
                                 <dockerFile>${project.basedir}/Dockerfile</dockerFile>
                                 <tags>
-                                    <tag>1.6.0</tag>
+                                    <tag>1.7.0</tag>
                                     <tag>latest</tag>
                                 </tags>
                             </build>
