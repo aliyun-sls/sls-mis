@@ -39,7 +39,7 @@ func (mw loggingMiddleware) Login(ctx context.Context, username, password string
 			"cust_name", username,
 		)
 	}(time.Now())
-	return mw.next.Login(nil, username, password)
+	return mw.next.Login(ctx, username, password)
 }
 
 func (mw loggingMiddleware) Register(ctx context.Context, username, password, email, first, last string) (string, error) {
@@ -53,7 +53,7 @@ func (mw loggingMiddleware) Register(ctx context.Context, username, password, em
 			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.Register(nil, username, password, email, first, last)
+	return mw.next.Register(ctx, username, password, email, first, last)
 }
 
 func (mw loggingMiddleware) PostUser(ctx context.Context, user users.User) (id string, err error) {
@@ -67,7 +67,7 @@ func (mw loggingMiddleware) PostUser(ctx context.Context, user users.User) (id s
 			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.PostUser(nil, user)
+	return mw.next.PostUser(ctx, user)
 }
 
 func (mw loggingMiddleware) GetUsers(ctx context.Context, id string) (u []users.User, err error) {
@@ -85,7 +85,7 @@ func (mw loggingMiddleware) GetUsers(ctx context.Context, id string) (u []users.
 			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.GetUsers(nil, id)
+	return mw.next.GetUsers(ctx, id)
 }
 
 func (mw loggingMiddleware) PostAddress(ctx context.Context, add users.Address, id string) (string, error) {
@@ -99,7 +99,7 @@ func (mw loggingMiddleware) PostAddress(ctx context.Context, add users.Address, 
 			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.PostAddress(nil, add, id)
+	return mw.next.PostAddress(ctx, add, id)
 }
 
 func (mw loggingMiddleware) GetAddresses(ctx context.Context, id string) (a []users.Address, err error) {
@@ -118,7 +118,7 @@ func (mw loggingMiddleware) GetAddresses(ctx context.Context, id string) (a []us
 			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.GetAddresses(nil, id)
+	return mw.next.GetAddresses(ctx, id)
 }
 
 func (mw loggingMiddleware) PostCard(ctx context.Context, card users.Card, id string) (string, error) {
@@ -134,7 +134,7 @@ func (mw loggingMiddleware) PostCard(ctx context.Context, card users.Card, id st
 			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.PostCard(nil, card, id)
+	return mw.next.PostCard(ctx, card, id)
 }
 
 func (mw loggingMiddleware) GetCards(ctx context.Context, id string) (a []users.Card, err error) {
@@ -152,7 +152,7 @@ func (mw loggingMiddleware) GetCards(ctx context.Context, id string) (a []users.
 			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.GetCards(nil, id)
+	return mw.next.GetCards(ctx, id)
 }
 
 func (mw loggingMiddleware) Delete(ctx context.Context, entity, id string) (err error) {
@@ -168,7 +168,7 @@ func (mw loggingMiddleware) Delete(ctx context.Context, entity, id string) (err 
 			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.Delete(nil, entity, id)
+	return mw.next.Delete(ctx, entity, id)
 }
 
 func (mw loggingMiddleware) Health(ctx context.Context, logger log.Logger) (health []Health) {
@@ -182,5 +182,5 @@ func (mw loggingMiddleware) Health(ctx context.Context, logger log.Logger) (heal
 			"took", time.Since(begin).Milliseconds(),
 		)
 	}(time.Now())
-	return mw.next.Health(nil, logger)
+	return mw.next.Health(ctx, logger)
 }

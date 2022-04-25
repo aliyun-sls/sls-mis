@@ -7,6 +7,7 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/sls-mis/demos/sls-mall/user/api"
 	"github.com/sls-mis/demos/sls-mall/user/users"
+	"go.opentelemetry.io/otel/trace"
 	"math/rand"
 	"os"
 	"strconv"
@@ -64,10 +65,13 @@ func (c ChaosMiddleware) Register(ctx context.Context, username, password, email
 
 func (c ChaosMiddleware) GetUsers(ctx context.Context, id string) ([]users.User, error) {
 	if rand.Intn(100) > (1 - c.config.slow_p) {
-		time.Sleep(time.Duration(rand.Int63n(c.config.server_max_sleep_time_us-c.config.server_min_sleep_time_us)+c.config.server_min_sleep_time_us) * time.Microsecond)
+		time.Sleep(time.Duration(rand.Int63n(c.config.server_max_sleep_time_us-c.config.server_min_sleep_time_us+1)+c.config.server_min_sleep_time_us) * time.Microsecond)
 	}
 
 	if rand.Intn(100) > (1 - c.config.throw_exception_p) {
+		if span := trace.SpanFromContext(ctx); span != nil {
+			span.RecordError(errors.New("Mock Exception"))
+		}
 		return nil, errors.New("Mock Exception")
 	}
 	return c.next.GetUsers(ctx, id)
@@ -87,10 +91,13 @@ func (c ChaosMiddleware) PostAddress(ctx context.Context, u users.Address, useri
 
 func (c ChaosMiddleware) GetCards(ctx context.Context, id string) ([]users.Card, error) {
 	if rand.Intn(100) > c.config.slow_p {
-		time.Sleep(time.Duration(rand.Int63n(c.config.server_max_sleep_time_us-c.config.server_min_sleep_time_us)+c.config.server_min_sleep_time_us) * time.Microsecond)
+		time.Sleep(time.Duration(rand.Int63n(c.config.server_max_sleep_time_us-c.config.server_min_sleep_time_us+1)+c.config.server_min_sleep_time_us) * time.Microsecond)
 	}
 
 	if rand.Intn(100) > c.config.throw_exception_p {
+		if span := trace.SpanFromContext(ctx); span != nil {
+			span.RecordError(errors.New("Mock Exception"))
+		}
 		return nil, errors.New("Mock Exception")
 	}
 	return c.next.GetCards(ctx, id)
@@ -109,8 +116,7 @@ func (c ChaosMiddleware) Health(ctx context.Context, logger log.Logger) []api.He
 }
 
 func NewConfiguration() *ChaosConfiguration {
-
-	return &ChaosConfiguration{
+	c := &ChaosConfiguration{
 		client_max_sleep_time_us: func() int64 {
 			if r, e := strconv.ParseInt(client_max_sleep_time_us, 10, 64); e != nil {
 				return 0
@@ -152,6 +158,6 @@ func NewConfiguration() *ChaosConfiguration {
 			} else {
 				return r
 			}
-		}(),
-	}
+		}()}
+	return c
 }
