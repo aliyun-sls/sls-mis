@@ -18,6 +18,6 @@ WORKDIR /sls-mall
 COPY target/carts.jar ./app.jar
 COPY target/opentelemetry-javaagent-all.jar .
 COPY startup.sh .
-RUN chmod +x startup.sh
+RUN apt-get update && apt-get -y install stress-ng && chmod +x startup.sh
 EXPOSE 8089
 CMD ["/sls-mall/startup.sh"]
