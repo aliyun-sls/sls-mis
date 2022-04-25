@@ -10,7 +10,13 @@ ENV PROJECT="" \
     DATABASE_NAME="integral" \
     DATABASE_USER="root" \
     DATABASE_PASSWORD="" \
-    DEPLOYMENT_ENVIRONMENT="production"
+    DEPLOYMENT_ENVIRONMENT="production" \
+    CLIENT_MAX_SLEEP_TIME_US=0 \
+    CLIENT_MIN_SLEEP_TIME_US=0 \
+    SLOW_P=0 \
+    SERVER_MIN_SLEEP_TIME_US=0 \
+    THROW_EXCEPTION_P=0 \
+    SERVER_MAX_SLEEP_TIME_US=0
 
 WORKDIR /sls-mall
 COPY target/anti-cheating.jar ./app.jar
