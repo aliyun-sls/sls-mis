@@ -24,7 +24,7 @@
         <ot-agent.download.url>
             https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download
         </ot-agent.download.url>
-        <ot-agent.version>v1.0.1</ot-agent.version>
+        <ot-agent.version>v1.7.2</ot-agent.version>
     </properties>
 
     <dependencies>
@@ -159,7 +159,7 @@
                             <build>
                                 <dockerFile>${project.basedir}/Dockerfile</dockerFile>
                                 <tags>
-                                    <tag>1.7.0</tag>
+                                    <tag>1.8.0</tag>
                                     <tag>latest</tag>
                                 </tags>
                             </build>

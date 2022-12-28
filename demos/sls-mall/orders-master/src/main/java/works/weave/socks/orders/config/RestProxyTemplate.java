@@ -19,12 +19,10 @@ public final class RestProxyTemplate {
 
     @Autowired RestTemplate restTemplate;
 
-    @Autowired ClientHttpRequestInterceptor clientHttpRequestInterceptor;
 
     @Bean
     public RestTemplate restTemplate() {
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getInterceptors().add(clientHttpRequestInterceptor);
         return restTemplate;
     }
 
@@ -51,7 +49,6 @@ public final class RestProxyTemplate {
         factory.setProxy(proxy);
 
         restTemplate.setRequestFactory(factory);
-        restTemplate.getInterceptors().add(clientHttpRequestInterceptor);
     }
 
     public RestTemplate getRestTemplate() {
