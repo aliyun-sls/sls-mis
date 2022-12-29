@@ -54,10 +54,13 @@ curl http://localhost:8080/capture/test123?captureParam=1234&donotCaputureParam=
 4. 效果展示
 
 生成的Trace
+
 [![Trace](./img/trace-detail.jpg)](./img/trace-detail.jpg)
 
 捕捉的请求参数
+
 [![Trace](./img/capture-parameter.jpg)](./img/capture-parameter.jpg)
 
 `@WithSpan`生成的Span
+
 [![with-span](./img/withSpan.jpg)](./img/withSpan.jpg)
