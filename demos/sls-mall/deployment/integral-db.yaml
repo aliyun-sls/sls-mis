@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: integral-db
+  name: integral-db
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: integral-db
+  serviceName: integral-db-svc
+  template:
+    metadata:
+      labels:
+        app: integral-db
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_ALLOW_EMPTY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_ALLOW_EMPTY_PASSWORD
+                  name: mysql-config
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_ROOT_PASSWORD
+                  name: mysql-config
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: INTEGRAL_DB_DATABASE
+                  name: mysql-config
+          image: "mysql:latest"
+          imagePullPolicy: Always
+          name: integral-db
+          volumeMounts:
+            - mountPath: /docker-entrypoint-initdb.d
+              name: integral-db-init-file
+            - mountPath: /etc/localtime
+              name: volume-localtime
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: integral-db-init-file
+          configMap:
+            name: integral-db-configure
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: volume-localtime
+  updateStrategy:
+    type: RollingUpdate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: integral-db
+  name: integral-db
+spec:
+  ports:
+    - name: tcp
+      port: 3306
+      protocol: TCP
+      targetPort: 3306
+  selector:
+    app: integral-db

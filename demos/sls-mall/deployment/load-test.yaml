@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: load-test
+  name: load-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: load-test
+  template:
+    metadata:
+      labels:
+        app: load-test
+    spec:
+      containers:
+        - args:
+            - "frontend:8079"
+          image: "sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/load-test:1.1.0"
+          imagePullPolicy: Always
+          name: load-test
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: load-test
+spec:
+  selector:
+    app: load-test
+  ports:
+    - name: "8080"
+      port: 8080
+status:
+  loadBalancer: {}

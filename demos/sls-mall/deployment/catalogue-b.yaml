@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: catalogue-b
+    application: catalogue
+    error: "1"
+  name: catalogue-b
+spec:
+  selector:
+    matchLabels:
+      app: catalogue-b
+  template:
+    metadata:
+      labels:
+        app: catalogue-b
+        application: catalogue
+    spec:
+      containers:
+        - env:
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_DATABASE
+                  name: mysql-config
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_ROOT_PASSWORD
+                  name: mysql-config
+            - name: MYSQL_HOST
+              value: mysql
+            - name: OTLP_ENDPOINT
+              value: "otel-collector-svc:55680"
+            - name: SERVICE_VERSION
+              value: 1.3.0
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: POD_ID
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: aliyun_logs_logtag-1634282872479_tags
+              value: application=catalogue
+          image: "sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/catalogue:1.3.0"
+          imagePullPolicy: Always
+          name: catalogue-b
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: host-time
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: host-time
