@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  generation: 3
+  labels:
+    app: rabbitmq
+  name: rabbitmq
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: rabbitmq
+  serviceName: rabbitmq-svc
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - image: "rabbitmq:latest"
+          imagePullPolicy: Always
+          name: rabbitmq
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+  updateStrategy:
+    type: RollingUpdate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+spec:
+  ports:
+    - name: p1
+      port: 15691
+      protocol: TCP
+      targetPort: 15691
+    - name: p2
+      port: 15692
+      protocol: TCP
+      targetPort: 15692
+    - name: p3
+      port: 25672
+      protocol: TCP
+      targetPort: 25672
+    - name: p4
+      port: 4369
+      protocol: TCP
+      targetPort: 4369
+    - name: p5
+      port: 5671
+      protocol: TCP
+      targetPort: 5671
+    - name: p6
+      port: 5672
+      protocol: TCP
+      targetPort: 5672
+  selector:
+    app: rabbitmq

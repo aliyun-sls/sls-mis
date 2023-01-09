@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: otel-zipkin
+  name: otel-zipkin
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: otel-zipkin
+  template:
+    metadata:
+      labels:
+        app: otel-zipkin
+    spec:
+      containers:
+        - env:
+            - name: ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: REGION_ENDPOINT
+                  name: environment-variables
+            - name: INSTANCE
+              valueFrom:
+                configMapKeyRef:
+                  key: INSTANCE
+                  name: environment-variables
+            - name: PROJECT
+              valueFrom:
+                configMapKeyRef:
+                  key: PROJECT
+                  name: environment-variables
+            - name: ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  key: ACCESS_KEY_ID
+                  name: ak
+            - name: ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: ACCESS_SECRET
+                  name: ak
+          image: >-
+            sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/otel-collector-zipkin:latest
+          imagePullPolicy: Always
+          name: otel-zipkin
+          ports:
+            - containerPort: 9411
+              name: http
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-zipkin
+spec:
+  ports:
+    - name: "9411"
+      port: 9411
+      targetPort: 9411
+  selector:
+    app: otel-zipkin
+status:
+  loadBalancer: {}

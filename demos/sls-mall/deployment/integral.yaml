@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: integral
+  name: integral
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: integral
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8091"
+        prometheus.io/scrape: "true"
+      labels:
+        app: integral
+    spec:
+      containers:
+        - env:
+            - name: ILOGTAIL_JMX_PORT
+              value: "9999"
+            - name: ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: HTTPS_ENDPOINT
+                  name: environment-variables
+            - name: INSTANCE
+              valueFrom:
+                configMapKeyRef:
+                  key: INSTANCE
+                  name: environment-variables
+            - name: PROJECT
+              valueFrom:
+                configMapKeyRef:
+                  key: PROJECT
+                  name: environment-variables
+            - name: ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  key: ACCESS_KEY_ID
+                  name: ak
+            - name: ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: ACCESS_SECRET
+                  name: ak
+            - name: DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: INTEGRAL_DB_DATABASE
+                  name: mysql-config
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_ROOT_PASSWORD
+                  name: mysql-config
+            - name: DATABASE_HOST
+              value: integral-db
+            - name: aliyun_logs_application_tags
+              value: application=integral
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: POD_ID
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: JAVA_TOOL_OPTIONS
+              value: >-
+                -Dcom.sun.management.jmxremote
+                -Dcom.sun.management.jmxremote.authenticate=false
+                -Dcom.sun.management.jmxremote.ssl=false
+                -Dcom.sun.management.jmxremote.local.only=false
+                -Dcom.sun.management.jmxremote.port=9999
+                -Dcom.sun.management.jmxremote.rmi.port=9999
+                -Djava.rmi.server.hostname=$(POD_ID)
+          image: "sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/integral:1.5.0"
+          imagePullPolicy: Always
+          name: integral
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: host-time
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: host-time
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: integral
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8091
+  selector:
+    app: integral
+  sessionAffinity: None
+  type: ClusterIP

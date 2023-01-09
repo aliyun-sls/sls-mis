@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: queue-master
+  name: queue-master
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: queue-master
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8087"
+        prometheus.io/scrape: "true"
+      labels:
+        app: queue-master
+    spec:
+      containers:
+        - env:
+            - name: ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: HTTPS_ENDPOINT
+                  name: environment-variables
+            - name: INSTANCE
+              valueFrom:
+                configMapKeyRef:
+                  key: INSTANCE
+                  name: environment-variables
+            - name: PROJECT
+              valueFrom:
+                configMapKeyRef:
+                  key: PROJECT
+                  name: environment-variables
+            - name: ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  key: ACCESS_KEY_ID
+                  name: ak
+            - name: ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: ACCESS_SECRET
+                  name: ak
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: POD_ID
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: aliyun_logs_application_tags
+              value: application=queue-master
+          image: >-
+            sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/queue-master:1.3.0
+          imagePullPolicy: Always
+          name: queue-master
+          resources:
+            requests:
+              cpu: "1"
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: host-time
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: host-time
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: queue-master
+spec:
+  ports:
+    - name: "8087"
+      port: 8087
+      targetPort: 8087
+  selector:
+    app: queue-master
+status:
+  loadBalancer: {}

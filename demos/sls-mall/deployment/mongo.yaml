@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: mongo
+  name: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  serviceName: mongo-svc
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+        - env:
+            - name: MONGO_INITDB_DATABASE
+              value: users
+          image: "mongo:5.0.5"
+          imagePullPolicy: Always
+          name: mongo
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: volume-localtime
+            - mountPath: /docker-entrypoint-initdb.d
+              name: mongo-configure-file
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: volume-localtime
+        - configMap:
+            name: mongo-configure
+          name: mongo-configure-file
+  updateStrategy:
+    type: RollingUpdate
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+spec:
+  ports:
+    - name: p1
+      port: 27017
+      protocol: TCP
+      targetPort: 27017
+  selector:
+    app: mongo

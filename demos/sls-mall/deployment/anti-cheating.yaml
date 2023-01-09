@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: anti-cheating
+  name: anti-cheating
+spec:
+  selector:
+    matchLabels:
+      app: anti-cheating
+  replicas: 3
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "8090"
+        prometheus.io/scrape: "true"
+      labels:
+        app: anti-cheating
+    spec:
+      containers:
+        - name: anti-cheating
+          image: sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/anti-cheating:1.4.0
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: host-time
+              mountPath: /etc/localtime
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          env:
+            - name: ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  key: ACCESS_KEY_ID
+                  name: ak
+            - name: ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: ACCESS_SECRET
+                  name: ak
+            - name: ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: HTTPS_ENDPOINT
+                  name: environment-variables
+            - name: INSTANCE
+              valueFrom:
+                configMapKeyRef:
+                  key: INSTANCE
+                  name: environment-variables
+            - name: PROJECT
+              valueFrom:
+                configMapKeyRef:
+                  key: PROJECT
+                  name: environment-variables
+            - name: DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: INTEGRAL_DB_DATABASE
+                  name: mysql-config
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: MYSQL_ROOT_PASSWORD
+                  name: mysql-config
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: spec.nodeName
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: POD_ID
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: DATABASE_HOST
+              value: integral-db
+            - name: aliyun_logs_logtag-1665721170482_tags
+              value: application=anti-cheating
+      volumes:
+        - name: host-time
+          hostPath:
+            path: /etc/localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: anticheating
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8090
+    - name: jolokia
+      port: 7777
+      protocol: TCP
+      targetPort: 7777
+    - name: promethus
+      port: 8888
+      protocol: TCP
+      targetPort: 8888
+  selector:
+    app: anti-cheating
+  sessionAffinity: None
+  type: ClusterIP

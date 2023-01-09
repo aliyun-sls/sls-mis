@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: otel-collector
+  name: otel-collector
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: otel-collector
+  template:
+    metadata:
+      labels:
+        app: otel-collector
+    spec:
+      containers:
+        - env:
+            - name: ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: REGION_ENDPOINT
+                  name: environment-variables
+            - name: INSTANCE
+              valueFrom:
+                configMapKeyRef:
+                  key: INSTANCE
+                  name: environment-variables
+            - name: PROJECT
+              valueFrom:
+                configMapKeyRef:
+                  key: PROJECT
+                  name: environment-variables
+            - name: ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  key: ACCESS_KEY_ID
+                  name: ak
+            - name: ACCESS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: ACCESS_SECRET
+                  name: ak
+          image: >-
+            sls-registry.cn-beijing.cr.aliyuncs.com/sls-mis/otel-collector:latest
+          imagePullPolicy: Always
+          name: otel-collector
+          ports:
+            - containerPort: 55680
+              name: grpc
+              protocol: TCP
+            - containerPort: 55681
+              name: http
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: host-time
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: host-time
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+spec:
+  ports:
+    - name: "55680"
+      port: 55680
+      targetPort: 55680
+    - name: "55681"
+      port: 55681
+      targetPort: 55681
+  selector:
+    app: otel-collector
+status:
+  loadBalancer: {}
