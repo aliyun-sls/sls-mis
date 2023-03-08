@@ -40,6 +40,7 @@ public class OrderMessageListener implements MessageListener {
 
 	public void startChaos() {
 		startTime.set(System.currentTimeMillis());
-		chaosMonkey.set(true);
+		System.out.println("Chaos Monkey is " + (chaosMonkey.get()? "on" : "off"));
+		chaosMonkey.set(!chaosMonkey.get());
 	}
 }

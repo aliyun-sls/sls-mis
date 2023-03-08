@@ -14,6 +14,5 @@ public class ConsoleOutProcessService {
 		Span.current().setAttribute("messaging.message.id", message.getMessageId().toString());
 		Span.current().setAttribute("messaging.rocketmq.client_group", "billing-service");
 		Span.current().setAttribute("messaging.rocketmq.topic", message.getTopic());
-		System.out.println("Receive an message from " + message.getTopic() + "");
 	}
 }
