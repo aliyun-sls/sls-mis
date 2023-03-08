@@ -2,17 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: order
-  name: order
+    app: billing
+  name: billing
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: order
+      app: billing
   template:
     metadata:
       labels:
-        app: order
+        app: billing
     spec:
       containers:
         - env:
@@ -83,7 +83,7 @@ spec:
                   fieldPath: status.podIP
             - name: aliyun_logs_application_tags
               value: application=order
-          image: "sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/orders:1.9.0_with_aliyun_rocketmq"
+          image: "sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/billing:1.0.0"
           imagePullPolicy: Always
           name: order
           resources:
@@ -102,21 +102,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: orders
+  name: billing
 spec:
   ports:
     - name: http
       port: 80
       protocol: TCP
-      targetPort: 8086
-    - name: jolokia
-      port: 7777
-      protocol: TCP
-      targetPort: 7777
-    - name: promethus
-      port: 8888
-      protocol: TCP
-      targetPort: 8888
+      targetPort: 8080
   selector:
     app: order
   sessionAffinity: None

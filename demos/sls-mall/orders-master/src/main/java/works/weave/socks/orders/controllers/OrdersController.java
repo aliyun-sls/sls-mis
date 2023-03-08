@@ -1,6 +1,8 @@
 package works.weave.socks.orders.controllers;
 
 import io.opentelemetry.api.trace.Span;
+import org.apache.rocketmq.client.apis.ClientException;
+import org.apache.rocketmq.shaded.com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import works.weave.socks.orders.entities.*;
 import works.weave.socks.orders.repositories.CustomerOrderRepository;
 import works.weave.socks.orders.resources.NewOrderResource;
 import works.weave.socks.orders.services.AsyncGetService;
+import works.weave.socks.orders.services.RocketMQService;
 import works.weave.socks.orders.values.PaymentRequest;
 import works.weave.socks.orders.values.PaymentResponse;
 
@@ -44,6 +47,9 @@ public class OrdersController {
 
     @Value(value = "${http.timeout:5}")
     private long timeout;
+
+    @Autowired
+    private RocketMQService rocketMQService;
 
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(path = "/orders", consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
@@ -165,11 +171,15 @@ public class OrdersController {
 
             savedOrder.setStatus("finished");
             customerOrderRepository.save(savedOrder);
+            // Send message to RocketMQ
+            rocketMQService.sentMessage(new Gson().toJson(order));
             return savedOrder;
         } catch (TimeoutException e) {
             throw new IllegalStateException("Unable to create order due to timeout from one of the services.", e);
         } catch (InterruptedException | IOException | ExecutionException e) {
             throw new IllegalStateException("Unable to create order due to unspecified IO error.", e);
+        } catch (ClientException e) {
+            throw new IllegalStateException("Unable to create order due to RocketMQ error.", e);
         }
     }
 

@@ -4,8 +4,8 @@ ENV PROJECT="" \
     ACCESS_SECRET="" \
     INSTANCE="" \
     ENDPOINT="" \
-    SERVICE_NAME="orders" \
-    SERVICE_VERSION="1.1.0" \
+    SERVICE_NAME="billing" \
+    SERVICE_VERSION="1.0.0" \
     DEPLOYMENT_ENVIRONMENT="production" \
     ROCKETMQ_ACCESSKEY="" \
     ROCKETMQ_SECRETKEY="" \
@@ -13,11 +13,10 @@ ENV PROJECT="" \
     ROCKETMQ_ORDER_TOPIC=""
 
 WORKDIR /sls-mall
-COPY target/orders.jar ./app.jar
+COPY target/billing.jar ./app.jar
 COPY agents/opentelemetry-javaagent.jar .
-COPY config.yaml .
 COPY startup.sh .
-RUN chmod +x startup.sh && apt-get update && apt-get -y install stress-ng
+RUN chmod +x startup.sh
 
-EXPOSE 8086
+EXPOSE 8080
 CMD ["/sls-mall/startup.sh"]
