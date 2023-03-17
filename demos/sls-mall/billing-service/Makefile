@@ -1,11 +1,11 @@
-IMAGE_NAME := sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/orders
-IMAGE_VERSION := 1.9.0_with_aliyun_rocketmq
+IMAGE_NAME := sls-registry.cn-beijing.cr.aliyuncs.com/sls-mall/billing
+IMAGE_VERSION := 1.0.0
 
 build_project:
-	 ./mvnw clean package -Dmaven.test.skip=true
+	 mvn clean package -Dmaven.test.skip=true
 
 build_images: build_project
-	./mvnw docker:build
+	mvn docker:build
 
 push_image: build_images
 	docker push $(IMAGE_NAME):$(IMAGE_VERSION)
